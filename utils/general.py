@@ -273,6 +273,7 @@ def check_requirements(requirements=ROOT / 'requirements.txt', exclude=(), insta
         try:
             pkg.require(r)
         except Exception as e:  # DistributionNotFound or VersionConflict if requirements not met
+            print(e)
             s = f"{prefix} {r} not found and is required by YOLOv5"
             if install:
                 print(f"{s}, attempting auto-update...")

@@ -54,6 +54,6 @@ def runAll(project, weights, dataset_template, datasets=None):
 
 
 def main():
-    runAll('temp/test_11.10_128a', 'yolov5s.pt', "upload/coco_128/coco128_", None)
+    runAll('temp/test_11.10_128a', 'yolov5s.pt', "upload/datasets/coco128_", None)
 
 main()

@@ -44,7 +44,7 @@ def runAll(project, weights, dataset_template, datasets=None):
         result = os.system(args)
         # with open('output.txt', 'ab') as f:
         #     f.write(result.stdout)
-        sleep(10)
+        time.sleep(3)
 
     
     zip_fname = f"{os.path.basename(project)}.zip"

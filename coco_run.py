@@ -36,7 +36,7 @@ def runAll(project, weights, dataset_template, datasets=None):
         datasets = DATASETS_NAMES
     
     for name in tqdm(datasets):
-        args = f"python val.py --weights {weights} --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-csv --save-txt --save-conf"
+        args = f"python val.py --weights {weights} --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-json --save-txt --save-conf"
         result = os.system(args)
         # with open('output.txt', 'ab') as f:
         #     f.write(result.stdout)

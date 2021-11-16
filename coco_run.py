@@ -37,9 +37,9 @@ def runAll(project, weights, dataset_template, datasets=None):
     
     for name in tqdm(datasets):
         args = f"python val.py --weights {weights} --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-csv --save-txt --save-conf"
-        result = subprocess.run(args, capture_output=True, shell=True)
-        with open('output.txt', 'ab') as f:
-            f.write(result.stdout)
+        result = subprocess.run(args, shell=True)
+        # with open('output.txt', 'ab') as f:
+        #     f.write(result.stdout)
 
     
     zip_fname = f"{os.path.basename(project)}.zip"

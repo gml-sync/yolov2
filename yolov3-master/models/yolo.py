@@ -157,6 +157,7 @@ class Model(nn.Module):
             y.append(x if m.i in self.save else None)  # save output
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
+            LOGGER.info(f"********************************* DTYPE {x.dtype}")
             # if i == 5: # for restoration
             #     feature_visualization(x.clone().detach(), m.type, m.i, save_dir=Path("visualize"))
         # self.out1 = True

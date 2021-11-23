@@ -158,7 +158,7 @@ class Model(nn.Module):
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
             if i == 5: # for restoration
-                feature_visualization(x.detach(), m.type, m.i, save_dir=Path("visualize"))
+                feature_visualization(x.clone().detach(), m.type, m.i, save_dir=Path("visualize"))
         # self.out1 = True
         return x
 

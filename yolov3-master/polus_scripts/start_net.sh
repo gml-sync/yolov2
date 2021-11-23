@@ -1,1 +1,1 @@
-cd ..; train.py --weights models/yolov3.pt
+cd ..; echo "Hello!"

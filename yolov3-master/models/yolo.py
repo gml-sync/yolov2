@@ -126,7 +126,6 @@ class Model(nn.Module):
         LOGGER.info('')
 
     def forward(self, x, augment=False, profile=False, visualize=False):
-        LOGGER.info(f"Augment={augment}")
         if augment:
             return self._forward_augment(x)  # augmented inference, None
         return self._forward_once(x, profile, visualize)  # single-scale inference, train
@@ -158,6 +157,8 @@ class Model(nn.Module):
             y.append(x if m.i in self.save else None)  # save output
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
+            if i == 5: # for restoration
+                feature_visualization(x, m.type, m.i, save_dir="visualize")
         self.out1 = True
         return x
 

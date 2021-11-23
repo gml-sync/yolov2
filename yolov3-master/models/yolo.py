@@ -126,7 +126,7 @@ class Model(nn.Module):
         LOGGER.info('')
 
     def forward(self, x, augment=False, profile=False, visualize=False):
-        LOGGER.info("Augment={augment}")
+        LOGGER.info(f"Augment={augment}")
         if augment:
             return self._forward_augment(x)  # augmented inference, None
         return self._forward_once(x, profile, visualize)  # single-scale inference, train
@@ -149,7 +149,6 @@ class Model(nn.Module):
         y, dt = [], []  # outputs
         for i, m in enumerate(self.model):
             if not self.out1:
-                self.out1 = True
                 LOGGER.info(f"layer {i} - {m}")
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
@@ -159,6 +158,7 @@ class Model(nn.Module):
             y.append(x if m.i in self.save else None)  # save output
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
+        self.out1 = True
         return x
 
     def _descale_pred(self, p, flips, scale, img_size):

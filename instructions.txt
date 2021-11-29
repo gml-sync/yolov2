@@ -6,3 +6,6 @@ upload/coco_128/coco128_010 -> upload/datasets/coco128_010
 https://github.com/ultralytics/yolov3
 
 python train.py --weights models/yolov3.pt > >(tee logfile) 2>&1
+
+Изменил:
+models/yolo.py для сохранения слоев

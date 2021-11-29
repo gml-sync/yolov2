@@ -147,18 +147,20 @@ class Model(nn.Module):
     def _forward_once(self, x, profile=False, visualize=False):
         y, dt = [], []  # outputs
         for i, m in enumerate(self.model):
-            # if not self.out1:
-            #     LOGGER.info(f"layer {i} - {m}")
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
             if profile:
                 self._profile_one_layer(m, x, dt)
             x = m(x)  # run
             y.append(x if m.i in self.save else None)  # save output
+            
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
-            LOGGER.info(f"********************************* DTYPE {x.dtype}")
-            # if i == 5: # for restoration
+
+            # Feature restoration
+
+            # LOGGER.info(f"********************************* DTYPE {x.dtype}")
+            # if i == 5:
             #     feature_visualization(x.clone().detach(), m.type, m.i, save_dir=Path("visualize"))
         # self.out1 = True
         return x

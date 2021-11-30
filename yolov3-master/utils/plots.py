@@ -144,7 +144,7 @@ def save_intermediate(x, module_type, stage, n=32, save_dir=Path('runs/detect/ex
 
                 x = x[0].cpu()
                 LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                x = einops.rearrange(x, '1 (i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
+                x = einops.rearrange(x, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
                 LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
 
                 # blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels

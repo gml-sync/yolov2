@@ -146,6 +146,7 @@ class Model(nn.Module):
 
     def _forward_once(self, x, profile=False, visualize=False):
         y, dt = [], []  # outputs
+        inp = x
         for i, m in enumerate(self.model):
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
@@ -160,9 +161,10 @@ class Model(nn.Module):
             # Feature restoration
 
             
-            if i == 5:
-                LOGGER.info(f"\n********************************* DTYPE {x.dtype} SIZE {x.size()} MODULE {m.type}")
-                b = x.clone().detach().float()
+            if i == 0:
+                b = inp.clone().detach().float()
+                LOGGER.info(f"\n********************************* DTYPE {b.dtype} SIZE {b.size()} MODULE {m.type}")
+                
                 feature_visualization(b, m.type, m.i, save_dir=Path("visualize"))
         # self.out1 = True
         return x

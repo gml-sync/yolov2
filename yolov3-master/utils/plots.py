@@ -120,6 +120,36 @@ class Annotator:
         # Return annotated image as array
         return np.asarray(self.im)
 
+def save_intermediate(x, module_type, stage, n=32, save_dir=Path('runs/detect/exp')):
+    """
+    x:              Features to be visualized
+    module_type:    Module type
+    stage:          Module stage within model
+    n:              Maximum number of feature maps to plot
+    save_dir:       Directory to save results
+    """
+    if 'Detect' not in module_type:
+        batch, channels, height, width = x.shape  # batch, channels, height, width
+        if height > 1 and width > 1:
+            f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
+
+            if stage == 0:
+                # save image
+                cv2.imwrite(f, x[0].cpu().permute(1, 2, 0), [cv2.IMWRITE_JPEG_QUALITY, 100])
+            else:
+                # save features
+                blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
+                n = min(n, channels)  # number of plots
+                fig, ax = plt.subplots(math.ceil(n / 8), 8, tight_layout=True)  # 8 rows x n/8 cols
+                ax = ax.ravel()
+                plt.subplots_adjust(wspace=0.05, hspace=0.05)
+                for i in range(n):
+                    ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
+                    ax[i].axis('off')
+
+                print(f'Saving {save_dir / f}... ({n}/{channels})')
+                plt.savefig(save_dir / f, dpi=300, bbox_inches='tight')
+                plt.close()
 
 def feature_visualization(x, module_type, stage, n=32, save_dir=Path('runs/detect/exp')):
     """

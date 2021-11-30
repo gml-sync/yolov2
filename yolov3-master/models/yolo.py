@@ -21,7 +21,7 @@ from models.common import *
 from models.experimental import *
 from utils.autoanchor import check_anchor_order
 from utils.general import LOGGER, check_version, check_yaml, make_divisible, print_args
-from utils.plots import feature_visualization
+from utils.plots import feature_visualization, save_intermediate
 from utils.torch_utils import (copy_attr, fuse_conv_and_bn, initialize_weights, model_info, scale_img, select_device,
                                time_sync)
 
@@ -160,12 +160,17 @@ class Model(nn.Module):
 
             # Feature restoration
 
-            
             if i == 0:
+                # save images
                 b = inp.clone().detach().float()
                 LOGGER.info(f"\n********************************* DTYPE {b.dtype} SIZE {b.size()} MODULE {m.type}")
-                
-                feature_visualization(b, m.type, m.i, save_dir=Path("visualize"))
+                save_intermediate(b, m.type, m.i, save_dir=Path("visualize"))
+            elif i == 5:
+                # save features
+                b = x.clone().detach().float()
+                LOGGER.info(f"\n********************************* DTYPE {b.dtype} SIZE {b.size()} MODULE {m.type}")
+                save_intermediate(b, m.type, m.i, save_dir=Path("visualize"))
+
         # self.out1 = True
         return x
 

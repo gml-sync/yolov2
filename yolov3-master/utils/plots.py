@@ -132,20 +132,27 @@ def save_intermediate(x, module_type, stage, n=32, save_dir=Path('runs/detect/ex
     if 'Detect' not in module_type:
         batch, channels, height, width = x.shape  # batch, channels, height, width
         if height > 1 and width > 1:
-            f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
+            
 
             if stage == 0:
                 # save image
+
+                f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename
                 x = x[0].cpu().permute(1, 2, 0)
                 LOGGER.info(f"\nSaving image... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
                 cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
             else:
                 # save features
 
+                f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
                 x = x[0].cpu()
                 LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
                 x = einops.rearrange(x, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
                 LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                x = (x - x.min()) / (x.max() - x.min() + 0.0001) # set value range to [0, 1]
+                cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8))
+
+
 
                 # blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
                 # n = min(n, channels)  # number of plots

@@ -159,8 +159,9 @@ class Model(nn.Module):
 
             # Feature restoration
 
-            LOGGER.info(f"********************************* DTYPE {x.dtype} SIZE {x.size()} MODULE {m.type}")
+            
             if i == 5:
+                LOGGER.info(f"********************************* DTYPE {x.dtype} SIZE {x.size()} MODULE {m.type}")
                 feature_visualization(x.clone().detach(), m.type, m.i, save_dir=Path("visualize"))
         # self.out1 = True
         return x

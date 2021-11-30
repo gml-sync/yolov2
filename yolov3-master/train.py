@@ -325,17 +325,16 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             # Disable train
 
             # # Backward
-            # scaler.scale(loss).backward()
+            scaler.scale(loss).backward()
 
             # Optimize
-            optimizer.zero_grad()
-            # if ni - last_opt_step >= accumulate:
-            #     scaler.step(optimizer)  # optimizer.step
-            #     scaler.update()
-            #     optimizer.zero_grad()
-            #     if ema:
-            #         ema.update(model)
-            #     last_opt_step = ni
+            if ni - last_opt_step >= accumulate:
+                scaler.step(optimizer)  # optimizer.step
+                scaler.update()
+                optimizer.zero_grad()
+                if ema:
+                    ema.update(model)
+                last_opt_step = ni
 
             # Log
             if RANK in [-1, 0]:

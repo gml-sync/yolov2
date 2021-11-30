@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sn
 import torch
+import einops
 from PIL import Image, ImageDraw, ImageFont
 
 from utils.general import (LOGGER, Timeout, check_requirements, clip_coords, increment_path, is_ascii, is_chinese,
@@ -136,22 +137,28 @@ def save_intermediate(x, module_type, stage, n=32, save_dir=Path('runs/detect/ex
             if stage == 0:
                 # save image
                 x = x[0].cpu().permute(1, 2, 0)
-                LOGGER.info(f"\nSaving... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                LOGGER.info(f"\nSaving image... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
                 cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
             else:
                 # save features
-                blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
-                n = min(n, channels)  # number of plots
-                fig, ax = plt.subplots(math.ceil(n / 8), 8, tight_layout=True)  # 8 rows x n/8 cols
-                ax = ax.ravel()
-                plt.subplots_adjust(wspace=0.05, hspace=0.05)
-                for i in range(n):
-                    ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
-                    ax[i].axis('off')
 
-                print(f'Saving {save_dir / f}... ({n}/{channels})')
-                plt.savefig(save_dir / f, dpi=300, bbox_inches='tight')
-                plt.close()
+                x = x[0].cpu()
+                LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                x = einops.rearrange(x, '1 (i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
+                LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+
+                # blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
+                # n = min(n, channels)  # number of plots
+                # fig, ax = plt.subplots(math.ceil(n / 8), 8, tight_layout=True)  # 8 rows x n/8 cols
+                # ax = ax.ravel()
+                # plt.subplots_adjust(wspace=0.05, hspace=0.05)
+                # for i in range(n):
+                #     ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
+                #     ax[i].axis('off')
+
+                # print(f'Saving {save_dir / f}... ({n}/{channels})')
+                # plt.savefig(save_dir / f, dpi=300, bbox_inches='tight')
+                # plt.close()
 
 def feature_visualization(x, module_type, stage, n=32, save_dir=Path('runs/detect/exp')):
     """

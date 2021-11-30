@@ -162,7 +162,7 @@ class Model(nn.Module):
             
             if i == 5:
                 LOGGER.info(f"\n********************************* DTYPE {x.dtype} SIZE {x.size()} MODULE {m.type}")
-                first_batch = x[0]
+                first_batch = x[:1]
                 feature_visualization(first_batch.clone().detach(), m.type, m.i, save_dir=Path("visualize"))
         # self.out1 = True
         return x

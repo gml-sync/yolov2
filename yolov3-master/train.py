@@ -322,26 +322,28 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                 if opt.quad:
                     loss *= 4.
 
-            # Backward
-            scaler.scale(loss).backward()
+            # Disable train
 
-            # Optimize
-            if ni - last_opt_step >= accumulate:
-                scaler.step(optimizer)  # optimizer.step
-                scaler.update()
-                optimizer.zero_grad()
-                if ema:
-                    ema.update(model)
-                last_opt_step = ni
+            # # Backward
+            # scaler.scale(loss).backward()
 
-            # Log
-            if RANK in [-1, 0]:
-                mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
-                mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
-                pbar.set_description(('%10s' * 2 + '%10.4g' * 5) % (
-                    f'{epoch}/{epochs - 1}', mem, *mloss, targets.shape[0], imgs.shape[-1]))
-                callbacks.run('on_train_batch_end', ni, model, imgs, targets, paths, plots, opt.sync_bn)
-            # end batch ------------------------------------------------------------------------------------------------
+            # # Optimize
+            # if ni - last_opt_step >= accumulate:
+            #     scaler.step(optimizer)  # optimizer.step
+            #     scaler.update()
+            #     optimizer.zero_grad()
+            #     if ema:
+            #         ema.update(model)
+            #     last_opt_step = ni
+
+            # # Log
+            # if RANK in [-1, 0]:
+            #     mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
+            #     mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
+            #     pbar.set_description(('%10s' * 2 + '%10.4g' * 5) % (
+            #         f'{epoch}/{epochs - 1}', mem, *mloss, targets.shape[0], imgs.shape[-1]))
+            #     callbacks.run('on_train_batch_end', ni, model, imgs, targets, paths, plots, opt.sync_bn)
+            # # end batch ------------------------------------------------------------------------------------------------
 
         # Scheduler
         lr = [x['lr'] for x in optimizer.param_groups]  # for loggers

@@ -133,39 +133,41 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
         batch, channels, height, width = x.shape  # batch, channels, height, width
         if height > 1 and width > 1:
             
+            for batch_i in range(batch):
+                if stage == 0:
+                    # save image
 
-            if stage == 0:
-                # save image
+                    #f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename
+                    f = f"{stage}_{batch_i}_image.jpg"  # filename
+                    x = x[batch_i].cpu().permute(1, 2, 0)
+                    LOGGER.info(f"\nSaving image... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                    cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
+                else:
+                    # save features
 
-                f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename
-                x = x[0].cpu().permute(1, 2, 0)
-                LOGGER.info(f"\nSaving image... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
-            else:
-                # save features
-
-                f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
-                x = x[0].cpu()
-                LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                x = einops.rearrange(x, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
-                LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                x = (x - x.min()) / (x.max() - x.min() + 0.0001) # set value range to [0, 1]
-                cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8))
-
+                    #f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
+                    f = f"{stage}_{batch_i}_features.png"  # filename
+                    x = x[batch_i].cpu()
+                    LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                    x = einops.rearrange(x, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
+                    LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                    x = (x - x.min()) / (x.max() - x.min() + 0.0001) # set value range to [0, 1]
+                    cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8))
 
 
-                # blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
-                # n = min(n, channels)  # number of plots
-                # fig, ax = plt.subplots(math.ceil(n / 8), 8, tight_layout=True)  # 8 rows x n/8 cols
-                # ax = ax.ravel()
-                # plt.subplots_adjust(wspace=0.05, hspace=0.05)
-                # for i in range(n):
-                #     ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
-                #     ax[i].axis('off')
 
-                # print(f'Saving {save_dir / f}... ({n}/{channels})')
-                # plt.savefig(save_dir / f, dpi=300, bbox_inches='tight')
-                # plt.close()
+                    # blocks = torch.chunk(x[0].cpu(), channels, dim=0)  # select batch index 0, block by channels
+                    # n = min(n, channels)  # number of plots
+                    # fig, ax = plt.subplots(math.ceil(n / 8), 8, tight_layout=True)  # 8 rows x n/8 cols
+                    # ax = ax.ravel()
+                    # plt.subplots_adjust(wspace=0.05, hspace=0.05)
+                    # for i in range(n):
+                    #     ax[i].imshow(blocks[i].squeeze())  # cmap='gray'
+                    #     ax[i].axis('off')
+
+                    # print(f'Saving {save_dir / f}... ({n}/{channels})')
+                    # plt.savefig(save_dir / f, dpi=300, bbox_inches='tight')
+                    # plt.close()
 
 def feature_visualization(x, module_type, stage, n=32, save_dir=Path('runs/detect/exp')):
     """

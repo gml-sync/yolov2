@@ -318,7 +318,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             with amp.autocast(enabled=cuda):
                 pred = model(imgs)  # forward
                 # save image and features
-                save_intermediate(model.save_image, save_dir=Path("visualize"))
+                save_intermediate(model.save_image, stage=i, save_dir=Path("visualize"))
                 loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
                 if RANK != -1:
                     loss *= WORLD_SIZE  # gradient averaged between devices in DDP mode

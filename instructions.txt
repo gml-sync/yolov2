@@ -9,3 +9,18 @@ python train.py --weights models/yolov3.pt > >(tee logfile) 2>&1
 
 Изменил:
 models/yolo.py - _forward_once для сохранения слоев
+utils/plots.py - save_intermediate
+
+python val.py --weights models/yolo-save.pt --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-csv --save-txt --save-conf"
+
+# Calypso
+
+\\calypso\work\22k_koz\recognition-aware
+
+coco_5k — COCO val 2017
+
+[
+  'video_name':
+  'dataset_name':
+  'metric_name':
+]

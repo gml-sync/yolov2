@@ -121,7 +121,7 @@ class Annotator:
         # Return annotated image as array
         return np.asarray(self.im)
 
-def save_intermediate(x, module_type, stage, n=32, save_dir=Path('runs/detect/exp')):
+def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/detect/exp')):
     """
     x:              Features to be visualized
     module_type:    Module type

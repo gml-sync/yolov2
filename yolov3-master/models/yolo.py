@@ -164,12 +164,14 @@ class Model(nn.Module):
                 # save images
                 b = inp.clone().detach().float()
                 LOGGER.info(f"\n********************************* DTYPE {b.dtype} SIZE {b.size()} MODULE {m.type}")
-                save_intermediate(b, m.type, m.i, save_dir=Path("visualize"))
+                self.save_image = b
+                #save_intermediate(b, m.type, m.i, save_dir=Path("visualize"))
             elif i == 5:
                 # save features
                 b = x.clone().detach().float()
                 LOGGER.info(f"\n********************************* DTYPE {b.dtype} SIZE {b.size()} MODULE {m.type}")
-                save_intermediate(b, m.type, m.i, save_dir=Path("visualize"))
+                self.save_features = b
+                #save_intermediate(b, m.type, m.i, save_dir=Path("visualize"))
 
         # self.out1 = True
         return x

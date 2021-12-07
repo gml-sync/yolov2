@@ -140,20 +140,21 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
                     #f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename
                     f = f"{stage}_{batch_i}_image.jpg"  # filename
                     LOGGER.info(f"\n********************************* PLOT DTYPE {x.dtype} SIZE {x.size()}")
-                    x = x[batch_i].cpu().permute(1, 2, 0)
-                    LOGGER.info(f"\nSaving image... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                    cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
+                    image = x[batch_i].cpu().permute(1, 2, 0) # c h w -> h w c
+                    image = image[:, [2, 1, 0]] # rgb -> bgr
+                    LOGGER.info(f"\nSaving image... DTYPE {image.dtype} SIZE {image.size()} MIN {image.min()} MAX {image.max()}")
+                    cv2.imwrite(str(save_dir / f), (image.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
                 else:
                     # save features
 
                     #f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
                     f = f"{stage}_{batch_i}_features.png"  # filename
-                    x = x[batch_i].cpu()
-                    LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                    x = einops.rearrange(x, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
-                    LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
-                    x = (x - x.min()) / (x.max() - x.min() + 0.0001) # set value range to [0, 1]
-                    cv2.imwrite(str(save_dir / f), (x.numpy() * 255).astype(np.uint8))
+                    image = x[batch_i].cpu()
+                    #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                    image = einops.rearrange(x, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
+                    #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+                    image = (image - image.min()) / (image.max() - image.min() + 0.0001) # set value range to [0, 1]
+                    cv2.imwrite(str(save_dir / f), (image.numpy() * 255).astype(np.uint8))
 
 
 

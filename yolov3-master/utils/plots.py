@@ -134,7 +134,7 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
         if height > 1 and width > 1:
             
             for batch_i in range(batch):
-                if stage == 0:
+                if module_type == "image":
                     # save image
 
                     #f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename

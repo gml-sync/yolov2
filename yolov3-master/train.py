@@ -318,6 +318,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             with amp.autocast(enabled=cuda):
                 pred = model(imgs)  # forward
                 # save image and features
+                LOGGER.info(f"\n********************************* SAVING IMAGE DTYPE {model.save_image.dtype} SIZE {model.save_image.size()}")
                 save_intermediate(model.save_image, module_type="image", stage=i, save_dir=Path("visualize"))
                 loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
                 if RANK != -1:

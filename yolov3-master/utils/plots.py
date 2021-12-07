@@ -139,10 +139,10 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
 
                     #f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename
                     f = f"{stage}_{batch_i}_image.jpg"  # filename
-                    LOGGER.info(f"\n********************************* PLOT DTYPE {x.dtype} SIZE {x.size()}")
+                    #LOGGER.info(f"\n********************************* PLOT DTYPE {x.dtype} SIZE {x.size()}")
                     image = x[batch_i].cpu().permute(1, 2, 0) # c h w -> h w c
                     image = image[:, :, [2, 1, 0]] # rgb -> bgr
-                    LOGGER.info(f"\nSaving image... DTYPE {image.dtype} SIZE {image.size()} MIN {image.min()} MAX {image.max()}")
+                    #LOGGER.info(f"\nSaving image... DTYPE {image.dtype} SIZE {image.size()} MIN {image.min()} MAX {image.max()}")
                     cv2.imwrite(str(save_dir / f), (image.numpy() * 255).astype(np.uint8), [cv2.IMWRITE_JPEG_QUALITY, 100])
                 else:
                     # save features

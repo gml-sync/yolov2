@@ -153,6 +153,11 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
                     #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
                     image = einops.rearrange(image, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
                     #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
+
+                    range_f = f"{stage}_{batch_i}_range.txt"  # filename
+                    with open(range_f, "w") as range_file:
+                        print(image.min(), image.max(), file=range_file)
+
                     image = (image - image.min()) / (image.max() - image.min() + 0.0001) # set value range to [0, 1]
                     cv2.imwrite(str(save_dir / f), (image.numpy() * 255).astype(np.uint8))
 

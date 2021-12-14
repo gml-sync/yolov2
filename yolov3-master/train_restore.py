@@ -18,11 +18,11 @@ class RestorationDataset(data.Dataset):
         self.image_list = [] # gt
         self.desc_list = [] # input range - min, max
 
-        dataset_root = Path("visualize")
+        dataset_root = "visualize"
 
-        self.feature_list = sorted(glob(dataset_root / "*features.png"))
-        self.image_list = sorted(glob(dataset_root / "*image.jpg"))
-        self.desc_list = sorted(glob(dataset_root / "*range.txt"))
+        self.feature_list = sorted(glob(dataset_root + "/*features.png"))
+        self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
+        self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
     def __getitem__(self, index):
         index = index % len(self.image_list)

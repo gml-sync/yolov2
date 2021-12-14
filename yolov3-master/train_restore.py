@@ -50,6 +50,7 @@ print(f.shape, i.shape)
 print(train_dataset.feature_list[1000],
     train_dataset.image_list[1000],
     train_dataset.desc_list[1000])
+print("Length of dataset:", len(train_dataset))
 
 class RestorationDecoder(nn.Module):
     def __init__(self):
@@ -280,8 +281,8 @@ train_loader = data.DataLoader(train_dataset, batch_size=4,
 
 loss_fn = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-# train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
+train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
 
-# print(train_loss)
+print(train_loss)
 
 # speed: ~10 sec per 100 images 

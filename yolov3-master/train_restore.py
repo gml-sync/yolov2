@@ -281,7 +281,7 @@ outputs_dir.mkdir(parents=True, exist_ok=True)
 model = RestorationDecoder()
 print("Parameters:", sum(p.numel() for p in model.parameters()))
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 loss_fn = nn.MSELoss()
 
 # Load model weights

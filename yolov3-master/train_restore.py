@@ -307,7 +307,7 @@ if Path(path).exists():
         print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
-train_loader = data.DataLoader(train_dataset, batch_size=32, 
+train_loader = data.DataLoader(train_dataset, batch_size=16, 
         pin_memory=False, shuffle=True, num_workers=2, drop_last=True)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)

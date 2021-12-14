@@ -14,6 +14,7 @@ train.py - train, там где forward, сохраняю промежуточн
 
 Данные:
 feat_16k_v1 - пробная генерация, с аугментацией, без сохранения min/max в признаках
+feat_16k_v2 - добавил *_*_range.txt для feature scaling перед сохранением
 
 python val.py --weights models/yolo-save.pt --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-csv --save-txt --save-conf"
 

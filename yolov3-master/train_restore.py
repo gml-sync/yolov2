@@ -30,11 +30,11 @@ class RestorationDataset(data.Dataset):
         min_feat, max_feat = 0, 0
         with open(self.desc_list[index], "r") as description:
             min_feat, max_feat = map(float, description.read().split())
-        features = cv2.imread(self.feature_list[index]).astype(np.float32)
-        features = features / 255 * (max_feat - min_feat) + min_feat
+        features = cv2.imread(self.feature_list[index]).astype(np.float32) / 255
+        features = features * (max_feat - min_feat) + min_feat
         features = features[:, :, 0]
         features = einops.rearrange(features, '(i1 h) (i2 w) -> (i1 i2) h w', h=80, w=80) # 80 is specific to layer 5
-        image = cv2.imread(self.image_list[index]).astype(np.float32)
+        image = cv2.imread(self.image_list[index]).astype(np.float32) / 255
 
         features = torch.from_numpy(features).float()
         image = torch.from_numpy(image).permute(2, 0, 1).float()
@@ -230,7 +230,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 running_acc  += acc.item()*dataloader.batch_size # without .item pytorch does not free CUDA memory!
                 running_loss += loss.item()*dataloader.batch_size
 
-                if step % 200 == 0:
+                if step % 10 == 0:
                     # clear_output(wait=True)
                     print('Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
                     #print(torch.cuda.memory_summary())
@@ -247,9 +247,11 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     torch.save(checkpoint, PATH)
                     checkpoint_save_path(PATH, save_json=True)
 
+                    gt_image = y.detach()[0].permute(1,2,0).cpu().numpy()
                     pred = outputs.detach()[0].permute(1,2,0).cpu().numpy()
                     outputs_dir = Path("outputs")
-                    cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), (pred / (pred.max()+0.001) * 255).astype(np.uint8))
+                    cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), (pred * 255).astype(np.uint8))
+                    cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
 
             epoch_loss = running_loss / len(dataloader.dataset)
             epoch_acc = running_acc / len(dataloader.dataset)

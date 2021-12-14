@@ -227,7 +227,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 # stats - whatever is the phase
                 acc = acc_fn(outputs, y)
 
-                running_acc  += acc.item()*dataloader.batch_size
+                running_acc  += acc.item()*dataloader.batch_size # without .item pytorch does not free CUDA memory!
                 running_loss += loss.item()*dataloader.batch_size
 
                 if step % 50 == 0:
@@ -240,7 +240,8 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     PATH = checkpoint_save_path(model_path)
 
                     checkpoint = {
-                        'model': model
+                        'model': model,
+                        'step': step
                     }
                     torch.save(checkpoint, PATH)
                     checkpoint_save_path(PATH, save_json=True)
@@ -276,6 +277,16 @@ outputs_dir.mkdir(parents=True, exist_ok=True)
 
 model = RestorationDecoder()
 print("Parameters:", sum(p.numel() for p in model.parameters()))
+
+# Load model weights
+model_path = Path("checkpoints/restore_model.pth")
+path = checkpoint_load_path(model_path)
+if Path(path).exists():
+    checkpoint = torch.load(path, map_location=torch.device(DEVICE))
+    if 'model' in checkpoint: # New format, full save
+        model = checkpoint['model']
+        # step = checkpoint['step']
+        # print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
 train_loader = data.DataLoader(train_dataset, batch_size=4, 

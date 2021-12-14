@@ -241,6 +241,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
 
                     checkpoint = {
                         'model': model,
+                        'optimizer': optimizer,
                         'step': step
                     }
                     torch.save(checkpoint, PATH)
@@ -278,6 +279,9 @@ outputs_dir.mkdir(parents=True, exist_ok=True)
 model = RestorationDecoder()
 print("Parameters:", sum(p.numel() for p in model.parameters()))
 
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+loss_fn = nn.MSELoss()
+
 # Load model weights
 model_path = Path("checkpoints/restore_model.pth")
 path = checkpoint_load_path(model_path)
@@ -285,6 +289,7 @@ if Path(path).exists():
     checkpoint = torch.load(path, map_location=torch.device(DEVICE))
     if 'model' in checkpoint: # New format, full save
         model = checkpoint['model']
+        optimizer = checkpoint['optimizer']
         step = checkpoint['step']
         print('Continue from', step, 'step')
 
@@ -292,8 +297,6 @@ train_dataset = RestorationDataset()
 train_loader = data.DataLoader(train_dataset, batch_size=4, 
         pin_memory=False, shuffle=True, num_workers=2, drop_last=True)
 
-loss_fn = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
 
 print(train_loss)

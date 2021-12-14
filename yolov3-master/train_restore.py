@@ -57,21 +57,21 @@ class RestorationDecoder(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.up1 = torch.nn.ConvTranspose2d(256, 128, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.up1 = self.upsample(256)
         self.bottle1_1 = self.bottleneck_block(128)
         self.bottle1_2 = self.bottleneck_block(128)
 
-        self.up2 = torch.nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.up2 = self.upsample(128)
         self.bottle2 = self.bottleneck_block(64)
 
-        self.up3 = torch.nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1)
+        self.up3 = self.upsample(64)
         self.conv_out = torch.nn.Conv2d(32, 3, kernel_size=3, stride=1, padding=1)
 
     def __call__(self, x):
         # print(f"x: {x.size()}")
         up1 = self.up1(x)
         # print(f"up1: {up1.size()}")
-        p = self.bottle1_1(up1)
+        # p = self.bottle1_1(up1)
         # print(f"bottle1_1: {p.size()}")
         bottle1_1 = self.bottle1_1(up1) + up1
         bottle1_2 = self.bottle1_2(bottle1_1) + bottle1_1
@@ -84,15 +84,24 @@ class RestorationDecoder(nn.Module):
 
         return out
     
+    def upsample(self, in_channels):
+        block = nn.Sequential(
+            torch.nn.ConvTranspose2d(in_channels, in_channels // 2, kernel_size=3, stride=2, padding=1, output_padding=1),
+            torch.nn.BatchNorm2d(in_channels // 2),
+            torch.nn.SiLU()
+            )
+        
+        return block
+
     def bottleneck_block(self, in_channels):
 
         block = nn.Sequential(
                             torch.nn.Conv2d(in_channels, in_channels // 2, kernel_size=1, stride=1, padding=0),
                             torch.nn.BatchNorm2d(in_channels // 2),
-                            torch.nn.ReLU(),
+                            torch.nn.SiLU(),
                             torch.nn.Conv2d(in_channels // 2, in_channels, kernel_size=3, stride=1, padding=1),
                             torch.nn.BatchNorm2d(in_channels),
-                            torch.nn.ReLU()
+                            torch.nn.SiLU()
                             )
         return block
 
@@ -269,6 +278,8 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
     
     return train_loss, valid_loss
 
+
+# Create directories
 model_dir = Path("checkpoints")
 model_dir.mkdir(parents=True, exist_ok=True)
 
@@ -281,7 +292,7 @@ outputs_dir.mkdir(parents=True, exist_ok=True)
 model = RestorationDecoder()
 print("Parameters:", sum(p.numel() for p in model.parameters()))
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 loss_fn = nn.MSELoss()
 
 # Load model weights
@@ -296,7 +307,7 @@ if Path(path).exists():
         print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
-train_loader = data.DataLoader(train_dataset, batch_size=16, 
+train_loader = data.DataLoader(train_dataset, batch_size=256, 
         pin_memory=False, shuffle=True, num_workers=2, drop_last=True)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)

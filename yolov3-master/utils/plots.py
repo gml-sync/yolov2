@@ -156,7 +156,7 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
 
                     range_f = f"{stage}_{batch_i}_range.txt"  # filename
                     with open(save_dir / range_f, "w") as range_file:
-                        print(image.min(), image.max(), file=range_file)
+                        print(image.min().detach().numpy(), image.max().detach().numpy(), file=range_file)
 
                     image = (image - image.min()) / (image.max() - image.min() + 0.0001) # set value range to [0, 1]
                     cv2.imwrite(str(save_dir / f), (image.numpy() * 255).astype(np.uint8))

@@ -219,6 +219,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     # scheduler.step()
 
                 else:
+                    print("WHAT??")
                     with torch.no_grad():
                         outputs = model(x)
                         loss = loss_fn(outputs, y.long())
@@ -229,7 +230,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 running_acc  += acc*dataloader.batch_size
                 running_loss += loss*dataloader.batch_size
 
-                if step % 20 == 0:
+                if step % 50 == 0:
                     # clear_output(wait=True)
                     print('Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
                     #print(torch.cuda.memory_summary())

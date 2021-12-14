@@ -239,7 +239,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 running_acc  += acc.item()*dataloader.batch_size # without .item pytorch does not free CUDA memory!
                 running_loss += loss.item()*dataloader.batch_size
 
-                if step % 10 == 0:
+                if step % 1 == 0:
                     # clear_output(wait=True)
                     print('Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
                     #print(torch.cuda.memory_summary())
@@ -307,7 +307,7 @@ if Path(path).exists():
         print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
-train_loader = data.DataLoader(train_dataset, batch_size=64, 
+train_loader = data.DataLoader(train_dataset, batch_size=32, 
         pin_memory=False, shuffle=True, num_workers=2, drop_last=True)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)

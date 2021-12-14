@@ -155,7 +155,7 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
                     #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
 
                     range_f = f"{stage}_{batch_i}_range.txt"  # filename
-                    with open(range_f, "w") as range_file:
+                    with open(save_dir / range_f, "w") as range_file:
                         print(image.min(), image.max(), file=range_file)
 
                     image = (image - image.min()) / (image.max() - image.min() + 0.0001) # set value range to [0, 1]

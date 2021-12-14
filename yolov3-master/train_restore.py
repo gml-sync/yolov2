@@ -259,7 +259,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     gt_image = y.detach()[0].permute(1,2,0).cpu().numpy()
                     pred = outputs.detach()[0].permute(1,2,0).cpu().numpy()
                     outputs_dir = Path("outputs")
-                    cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), (pred * 255).astype(np.uint8))
+                    cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
                     cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
 
             epoch_loss = running_loss / len(dataloader.dataset)

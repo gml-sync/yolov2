@@ -227,8 +227,8 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 # stats - whatever is the phase
                 acc = acc_fn(outputs, y)
 
-                running_acc  += acc*dataloader.batch_size
-                running_loss += loss*dataloader.batch_size
+                running_acc  += acc.item()*dataloader.batch_size
+                running_loss += loss.item()*dataloader.batch_size
 
                 if step % 50 == 0:
                     # clear_output(wait=True)

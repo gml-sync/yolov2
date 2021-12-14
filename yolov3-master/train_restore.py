@@ -51,6 +51,7 @@ print(train_dataset.feature_list[1000],
     train_dataset.image_list[1000],
     train_dataset.desc_list[1000])
 print("Length of dataset:", len(train_dataset))
+print(f"images: {len(train_dataset.image_list)}, features: {len(train_dataset.feature_list)}, desc: {len(train_dataset.desc_list)}")
 
 class RestorationDecoder(nn.Module):
     def __init__(self):

@@ -285,8 +285,8 @@ if Path(path).exists():
     checkpoint = torch.load(path, map_location=torch.device(DEVICE))
     if 'model' in checkpoint: # New format, full save
         model = checkpoint['model']
-        # step = checkpoint['step']
-        # print('Continue from', step, 'step')
+        step = checkpoint['step']
+        print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
 train_loader = data.DataLoader(train_dataset, batch_size=4, 

@@ -33,7 +33,8 @@ class RestorationDataset(data.Dataset):
 
         # distort input features with ffmpeg
         os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 37 h264_{rand_filename}.mkv")
-        os.system(f"ffmpeg -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
+        os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
+        os.system(f"ls -l h264_{rand_filename}.mkv")
         h264_feat_path = f"output_{rand_filename}_001.bmp"
 
         min_feat, max_feat = 0, 0
@@ -272,6 +273,9 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     outputs_dir = Path("outputs")
                     cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
                     cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
+                
+                if step > 6:
+                    break
 
             epoch_loss = running_loss / len(dataloader.dataset)
             epoch_acc = running_acc / len(dataloader.dataset)
@@ -322,6 +326,6 @@ train_dataset = RestorationDataset()
 train_loader = data.DataLoader(train_dataset, batch_size=1, 
         pin_memory=False, shuffle=True, num_workers=1, drop_last=True) # batch size 16, workers 4
 
-train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
+train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=2)
 
 # speed: ~10 sec per 100 images 

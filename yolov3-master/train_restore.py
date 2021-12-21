@@ -28,10 +28,12 @@ class RestorationDataset(data.Dataset):
     def __getitem__(self, index):
         index = index % len(self.image_list)
 
+        rand_filename = str(np.random.randint(1000000)).zfill(6)
+
         # distort input features with ffmpeg
-        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 37 h264_{index}.mkv")
-        os.system(f"ffmpeg -i h264_{index}.mkv -r 1/1 output_{index}_%03d.bmp")
-        h264_feat_path = f"output_{index}_001.bmp"
+        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 37 h264_{rand_filename}.mkv")
+        os.system(f"ffmpeg -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
+        h264_feat_path = f"output_{rand_filename}_001.bmp"
 
         min_feat, max_feat = 0, 0
         with open(self.desc_list[index], "r") as description:

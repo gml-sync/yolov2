@@ -27,6 +27,7 @@ class RestorationDataset(data.Dataset):
 
     def __getitem__(self, index):
         index = index % len(self.image_list)
+        index = index % 3
 
         rand_filename = str(np.random.randint(1000000)).zfill(6)
 
@@ -47,7 +48,7 @@ class RestorationDataset(data.Dataset):
         features = torch.from_numpy(features).float()
         image = torch.from_numpy(image).permute(2, 0, 1).float()
 
-        #os.system(f"rm h264_{index}.mkv output_{index}_001.bmp")
+        os.system(f"rm h264_{rand_filename}.mkv {h264_feat_path}")
 
         return features, image
         
@@ -317,13 +318,10 @@ if Path(path).exists():
         print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
-a = train_dataset[0]
 
-# train_loader = data.DataLoader(train_dataset, batch_size=16, 
-#         pin_memory=False, shuffle=True, num_workers=4, drop_last=True)
+train_loader = data.DataLoader(train_dataset, batch_size=1, 
+        pin_memory=False, shuffle=True, num_workers=1, drop_last=True) # batch size 16, workers 4
 
-# train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
-
-# print(train_loss)
+train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
 
 # speed: ~10 sec per 100 images 

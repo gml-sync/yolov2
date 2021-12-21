@@ -32,7 +32,7 @@ class RestorationDataset(data.Dataset):
         rand_filename = str(np.random.randint(1000000)).zfill(6)
 
         # distort input features with ffmpeg
-        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 37 h264_{rand_filename}.mkv")
+        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 18 h264_{rand_filename}.mkv")
         os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
         os.system(f"ls -l h264_{rand_filename}.mkv")
         h264_feat_path = f"output_{rand_filename}_001.bmp"

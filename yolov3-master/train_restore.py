@@ -1,5 +1,6 @@
 from glob import glob
 from pathlib import Path
+import os
 
 import numpy as np
 import cv2
@@ -27,10 +28,15 @@ class RestorationDataset(data.Dataset):
     def __getitem__(self, index):
         index = index % len(self.image_list)
 
+        # distort input features with ffmpeg
+        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 37 h264_{index}.mkv")
+        os.system(f"ffmpeg -i h264_{index}.mkv -r 1/1 output_{index}_%03d.bmp")
+        h264_feat_path = f"output_{index}_001.bmp"
+
         min_feat, max_feat = 0, 0
         with open(self.desc_list[index], "r") as description:
             min_feat, max_feat = map(float, description.read().split())
-        features = cv2.imread(self.feature_list[index]).astype(np.float32) / 255
+        features = cv2.imread(h264_feat_path).astype(np.float32) / 255
         features = features * (max_feat - min_feat) + min_feat
         features = features[:, :, 0]
         features = einops.rearrange(features, '(i1 h) (i2 w) -> (i1 i2) h w', h=80, w=80) # 80 is specific to layer 5
@@ -38,6 +44,8 @@ class RestorationDataset(data.Dataset):
 
         features = torch.from_numpy(features).float()
         image = torch.from_numpy(image).permute(2, 0, 1).float()
+
+        #os.system(f"rm h264_{index}.mkv output_{index}_001.bmp")
 
         return features, image
         
@@ -307,11 +315,13 @@ if Path(path).exists():
         print('Continue from', step, 'step')
 
 train_dataset = RestorationDataset()
-train_loader = data.DataLoader(train_dataset, batch_size=16, 
-        pin_memory=False, shuffle=True, num_workers=4, drop_last=True)
+a = train_dataset[0]
 
-train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
+# train_loader = data.DataLoader(train_dataset, batch_size=16, 
+#         pin_memory=False, shuffle=True, num_workers=4, drop_last=True)
 
-print(train_loss)
+# train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=20)
+
+# print(train_loss)
 
 # speed: ~10 sec per 100 images 

@@ -16,6 +16,15 @@ train.py - train, там где forward, сохраняю промежуточн
 feat_16k_v1 - пробная генерация, с аугментацией, без сохранения min/max в признаках
 feat_16k_v2 - добавил *_*_range.txt для feature scaling перед сохранением
 
+Модели:
+model_v1 - без ffmpeg, обучение <40 эпох
+
+FFMPEG:
+
+ffmpeg -loglevel quiet -y -i sample_train/0_0_features.png -c:v libx264 -qp 37 output.mkv && ls -l output.mkv
+ffmpeg -i output.mkv -r 1/1 h264_%03d.bmp
+
+
 python val.py --weights models/yolo-save.pt --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-csv --save-txt --save-conf"
 
 # Calypso

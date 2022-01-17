@@ -37,7 +37,7 @@ class RestorationDataset(data.Dataset):
 
         rand_filename = str(np.random.randint(1000000)).zfill(6)
         # encode
-        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 0 h264_{rand_filename}.mkv")
+        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 37 h264_{rand_filename}.mkv")
         # decode
         os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
 

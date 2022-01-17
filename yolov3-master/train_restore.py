@@ -79,6 +79,8 @@ print(train_dataset.feature_list[1000],
 print("Length of dataset:", len(train_dataset))
 print(f"images: {len(train_dataset.image_list)}, features: {len(train_dataset.feature_list)}, desc: {len(train_dataset.desc_list)}")
 
+os.system("rm *.mkv *.bmp")
+
 class RestorationDecoder(nn.Module):
     def __init__(self):
         super().__init__()
@@ -334,8 +336,8 @@ if Path(path).exists():
 
 train_dataset = RestorationDataset()
 
-train_loader = data.DataLoader(train_dataset, batch_size=1, 
-        pin_memory=False, shuffle=True, num_workers=4, drop_last=True, # batch size 16, workers 4
+train_loader = data.DataLoader(train_dataset, batch_size=4,
+        pin_memory=False, shuffle=True, num_workers=32, drop_last=True, # batch size 16, workers 4
         worker_init_fn=dataloader_seed)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1)

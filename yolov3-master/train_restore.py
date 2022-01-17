@@ -38,15 +38,12 @@ class RestorationDataset(data.Dataset):
         rand_qps = [0, 22, 27, 32, 37]
         qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
-        print("QP", rand_qp)
 
         rand_filename = str(np.random.randint(1000000)).zfill(6)
         # encode
         os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp {rand_qp} h264_{rand_filename}.mkv")
         # decode
         os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
-
-        os.system(f"cp {self.feature_list[index]} feat_{rand_filename}.png")
 
         h264_feat_path = f"output_{rand_filename}_001.bmp"
         min_feat, max_feat = 0, 0
@@ -61,7 +58,7 @@ class RestorationDataset(data.Dataset):
         features = torch.from_numpy(features).float()
         image = torch.from_numpy(image).permute(2, 0, 1).float()
 
-        #os.system(f"rm h264_{rand_filename}.mkv {h264_feat_path}")
+        os.system(f"rm h264_{rand_filename}.mkv {h264_feat_path}")
 
         return features, image
         
@@ -76,8 +73,6 @@ print(train_dataset.feature_list[1000],
     train_dataset.desc_list[1000])
 print("Length of dataset:", len(train_dataset))
 print(f"images: {len(train_dataset.image_list)}, features: {len(train_dataset.feature_list)}, desc: {len(train_dataset.desc_list)}")
-
-exit()
 
 class RestorationDecoder(nn.Module):
     def __init__(self):

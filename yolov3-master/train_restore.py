@@ -36,7 +36,7 @@ class RestorationDataset(data.Dataset):
         #         -qp quality param, higher is worse. Take values [0, 22, 27, 32, 37]
 
         rand_qps = [0, 22, 27, 32, 37]
-        qp_idx = np.random.randint(len(rand_values))
+        qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
         print("QP", rand_qp)
 

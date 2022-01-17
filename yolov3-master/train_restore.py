@@ -26,6 +26,8 @@ class RestorationDataset(data.Dataset):
         self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
         self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
+        self.worker_id = None
+
     def __getitem__(self, index):
         index = index % len(self.image_list)
         index = index % 3
@@ -39,7 +41,11 @@ class RestorationDataset(data.Dataset):
         qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
 
-        rand_filename = ''.join([str(np.random.randint(10)) for i in range(20)])
+        worker_info = torch.utils.data.get_worker_info()
+        if worker_info is None: # single-process data loading
+            rand_filename = "0"
+        else:
+            rand_filename = str(worker_info.id)
         mkv_path = f"h264_{rand_filename}.mkv"
         bmp_path = f"output_{rand_filename}_001.bmp"
 
@@ -67,8 +73,8 @@ class RestorationDataset(data.Dataset):
     def __len__(self):
         return len(self.image_list)
 
-def dataloader_seed(worker_id):
-    np.random.seed(worker_id)
+    def dataloader_worker(self, worker_id):
+        self.worker_id = worker_id
 
 train_dataset = RestorationDataset()
 # f, i = train_dataset[0]
@@ -338,7 +344,7 @@ train_dataset = RestorationDataset()
 
 train_loader = data.DataLoader(train_dataset, batch_size=4,
         pin_memory=False, shuffle=True, num_workers=32, drop_last=True, # batch size 16, workers 4
-        worker_init_fn=dataloader_seed)
+        worker_init_fn=train_dataset.dataloader_worker)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1)
 

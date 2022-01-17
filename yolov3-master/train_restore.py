@@ -271,7 +271,8 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
 
                 if step % 100 == 0:
                     # clear_output(wait=True)
-                    print('{} Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
+                    print('Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(
+                        step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
                     #print(torch.cuda.memory_summary())
 
                     # Save model

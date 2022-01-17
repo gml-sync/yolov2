@@ -44,6 +44,7 @@ class RestorationDataset(data.Dataset):
             rand_filename = "0"
         else:
             rand_filename = str(worker_info.id)
+        rand_filename += "_" + str(index)
         mkv_path = f"h264_{rand_filename}.mkv"
         bmp_path = f"output_{rand_filename}_001.bmp"
 
@@ -337,8 +338,8 @@ if Path(path).exists():
 
 train_dataset = RestorationDataset()
 
-train_loader = data.DataLoader(train_dataset, batch_size=4,
-        pin_memory=False, shuffle=True, num_workers=32, drop_last=True) # batch size 16, workers 4
+train_loader = data.DataLoader(train_dataset, batch_size=4,  # batch size 16, workers 4
+        pin_memory=False, shuffle=True, num_workers=32, drop_last=True)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1)
 

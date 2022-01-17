@@ -30,27 +30,28 @@ class RestorationDataset(data.Dataset):
         index = index % len(self.image_list)
         index = index % 3
 
-
-
         # distort input features with ffmpeg
         # options: -y allow overwriting without confirmation
         #         -qp quality param, higher is worse. Take values [0, 22, 27, 32, 37]
+        # output: compressed .mkv, decoded .bmp
 
         rand_qps = [0, 22, 27, 32, 37]
         qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
 
         rand_filename = ''.join([str(np.random.randint(10)) for i in range(20)])
-        # encode
-        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp {rand_qp} h264_{rand_filename}.mkv")
-        # decode
-        os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
+        mkv_path = f"h264_{rand_filename}.mkv"
+        bmp_path = f"output_{rand_filename}_001.bmp"
 
-        h264_feat_path = f"output_{rand_filename}_001.bmp"
+        # encode
+        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp {rand_qp} {mkv_path}")
+        # decode
+        os.system(f"ffmpeg -loglevel quiet -i {mkv_path} -r 1/1 output_{rand_filename}_%03d.bmp")
+
         min_feat, max_feat = 0, 0
         with open(self.desc_list[index], "r") as description:
             min_feat, max_feat = map(float, description.read().split())
-        features = cv2.imread(h264_feat_path).astype(np.float32) / 255
+        features = cv2.imread(bmp_path).astype(np.float32) / 255
         features = features * (max_feat - min_feat) + min_feat
         features = features[:, :, 0]
         features = einops.rearrange(features, '(i1 h) (i2 w) -> (i1 i2) h w', h=80, w=80) # 80 is specific to layer 5
@@ -59,16 +60,19 @@ class RestorationDataset(data.Dataset):
         features = torch.from_numpy(features).float()
         image = torch.from_numpy(image).permute(2, 0, 1).float()
 
-        os.system(f"rm h264_{rand_filename}.mkv {h264_feat_path}")
+        os.system(f"rm {mkv_path} {bmp_path}")
 
         return features, image
         
     def __len__(self):
         return len(self.image_list)
 
+def dataloader_seed(worker_id):
+    np.random.seed(worker_id)
+
 train_dataset = RestorationDataset()
-f, i = train_dataset[0]
-print(f.shape, i.shape)
+# f, i = train_dataset[0]
+# print(f.shape, i.shape)
 print(train_dataset.feature_list[1000],
     train_dataset.image_list[1000],
     train_dataset.desc_list[1000])
@@ -331,7 +335,8 @@ if Path(path).exists():
 train_dataset = RestorationDataset()
 
 train_loader = data.DataLoader(train_dataset, batch_size=1, 
-        pin_memory=False, shuffle=True, num_workers=4, drop_last=True) # batch size 16, workers 4
+        pin_memory=False, shuffle=True, num_workers=4, drop_last=True, # batch size 16, workers 4
+        worker_init_fn=dataloader_seed)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1)
 

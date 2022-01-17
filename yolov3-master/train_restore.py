@@ -260,7 +260,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 running_acc  += acc.item()*dataloader.batch_size # without .item pytorch does not free CUDA memory!
                 running_loss += loss.item()*dataloader.batch_size
 
-                if step % 1 == 0:
+                if step % 100 == 0:
                     # clear_output(wait=True)
                     print('Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
                     #print(torch.cuda.memory_summary())
@@ -282,9 +282,6 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     outputs_dir = Path("outputs")
                     cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
                     cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
-                
-                if step > 6:
-                    break
 
             epoch_loss = running_loss / len(dataloader.dataset)
             epoch_acc = running_acc / len(dataloader.dataset)
@@ -335,6 +332,6 @@ train_dataset = RestorationDataset()
 train_loader = data.DataLoader(train_dataset, batch_size=1, 
         pin_memory=False, shuffle=True, num_workers=1, drop_last=True) # batch size 16, workers 4
 
-train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=2)
+train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1)
 
 # speed: ~10 sec per 100 images 

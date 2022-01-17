@@ -29,7 +29,6 @@ class RestorationDataset(data.Dataset):
 
     def __getitem__(self, index):
         index = index % len(self.image_list)
-        index = index % 3
 
         # distort input features with ffmpeg
         # options: -y allow overwriting without confirmation

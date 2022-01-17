@@ -26,8 +26,6 @@ class RestorationDataset(data.Dataset):
         self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
         self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
-        self.worker_id = None
-
     def __getitem__(self, index):
         index = index % len(self.image_list)
         index = index % 3
@@ -72,9 +70,6 @@ class RestorationDataset(data.Dataset):
         
     def __len__(self):
         return len(self.image_list)
-
-    def dataloader_worker(self, worker_id):
-        self.worker_id = worker_id
 
 train_dataset = RestorationDataset()
 # f, i = train_dataset[0]
@@ -343,8 +338,7 @@ if Path(path).exists():
 train_dataset = RestorationDataset()
 
 train_loader = data.DataLoader(train_dataset, batch_size=4,
-        pin_memory=False, shuffle=True, num_workers=32, drop_last=True, # batch size 16, workers 4
-        worker_init_fn=train_dataset.dataloader_worker)
+        pin_memory=False, shuffle=True, num_workers=32, drop_last=True) # batch size 16, workers 4
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1)
 

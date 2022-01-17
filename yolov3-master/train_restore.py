@@ -29,14 +29,21 @@ class RestorationDataset(data.Dataset):
         index = index % len(self.image_list)
         index = index % 3
 
-        rand_filename = str(np.random.randint(1000000)).zfill(6)
+
 
         # distort input features with ffmpeg
-        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 18 h264_{rand_filename}.mkv")
-        os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
-        os.system(f"ls -l h264_{rand_filename}.mkv")
-        h264_feat_path = f"output_{rand_filename}_001.bmp"
+        # options: -y allow overwriting without confirmation
+        #         -qp quality param, higher is worse. Take values [lossless, 22, 27, 32, 37]
 
+        rand_filename = str(np.random.randint(1000000)).zfill(6)
+        # encode
+        os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp 18 h264_{rand_filename}.mkv")
+        # decode
+        os.system(f"ffmpeg -loglevel quiet -i h264_{rand_filename}.mkv -r 1/1 output_{rand_filename}_%03d.bmp")
+
+        os.system(f"cp {self.feature_list[index]} feat_{rand_filename}.png")
+
+        h264_feat_path = f"output_{rand_filename}_001.bmp"
         min_feat, max_feat = 0, 0
         with open(self.desc_list[index], "r") as description:
             min_feat, max_feat = map(float, description.read().split())
@@ -49,7 +56,7 @@ class RestorationDataset(data.Dataset):
         features = torch.from_numpy(features).float()
         image = torch.from_numpy(image).permute(2, 0, 1).float()
 
-        os.system(f"rm h264_{rand_filename}.mkv {h264_feat_path}")
+        #os.system(f"rm h264_{rand_filename}.mkv {h264_feat_path}")
 
         return features, image
         

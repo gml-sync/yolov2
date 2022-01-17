@@ -1,3 +1,4 @@
+import sys
 from glob import glob
 from pathlib import Path
 import os
@@ -46,6 +47,7 @@ class RestorationDataset(data.Dataset):
             rand_filename = str(worker_info.id)
         rand_filename += "_" + str(index)
         print("loading", rand_filename)
+        sys.stdout.flush()
         mkv_path = f"h264_{rand_filename}.mkv"
         bmp_path = f"output_{rand_filename}_001.bmp"
 

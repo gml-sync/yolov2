@@ -40,7 +40,7 @@ class RestorationDataset(data.Dataset):
         qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
 
-        rand_filename = str(np.random.randint(100000000000000000)).zfill(19)
+        rand_filename = ''.join([str(np.random.randint(10)) for i in range(20)])
         # encode
         os.system(f"ffmpeg -loglevel quiet -y -i {self.feature_list[index]} -c:v libx264 -qp {rand_qp} h264_{rand_filename}.mkv")
         # decode

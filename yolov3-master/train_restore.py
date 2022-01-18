@@ -43,8 +43,9 @@ class RestorationDataset(data.Dataset):
         qp_idx = self.qp_idx
         #qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
-        self.qp_idx += 1
-        if self.qp_idx == len(rand_qps):
+        if self.qp_idx == 0:
+            self.qp_idx = len(rand_qps) - 1
+        elif self.qp_idx == len(rand_qps) - 1:
             self.qp_idx = 0
             self.img_idx += 1
 

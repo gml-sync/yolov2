@@ -32,7 +32,7 @@ class RestorationDataset(data.Dataset):
 
     def __getitem__(self, index):
         index = index % len(self.image_list)
-        index = self.img_idx
+        #index = self.img_idx
 
         # distort input features with ffmpeg
         # options: -y allow overwriting without confirmation
@@ -352,9 +352,9 @@ if Path(path).exists():
 train_dataset = RestorationDataset()
 
 train_loader = data.DataLoader(train_dataset, batch_size=1,  # batch size 16, workers 16
-        pin_memory=False, shuffle=False, num_workers=1, drop_last=True)
+        pin_memory=False, shuffle=True, num_workers=1, drop_last=True)
 
-train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=40)
+train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1) # epochs 40
 
 # speed: ~10 sec per 100 images
 # with ffmpeg, 16 workers: 7 sec per 160 images

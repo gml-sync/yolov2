@@ -27,8 +27,12 @@ class RestorationDataset(data.Dataset):
         self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
         self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
+        self.qp_idx = 0
+        self.img_idx = 0
+
     def __getitem__(self, index):
         index = index % len(self.image_list)
+        index = self.img_idx
 
         # distort input features with ffmpeg
         # options: -y allow overwriting without confirmation
@@ -36,8 +40,13 @@ class RestorationDataset(data.Dataset):
         # output: compressed .mkv, decoded .bmp
 
         rand_qps = [0, 22, 27, 32, 37]
-        qp_idx = np.random.randint(len(rand_qps))
+        qp_idx = self.qp_idx
+        #qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
+        self.qp_idx += 1
+        if self.qp_idx == len(rand_qps):
+            self.qp_idx = 0
+            self.img_idx += 1
 
         worker_info = torch.utils.data.get_worker_info()
         if worker_info is None: # single-process data loading
@@ -269,7 +278,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                 running_acc  += acc.item()*dataloader.batch_size # without .item pytorch does not free CUDA memory!
                 running_loss += loss.item()*dataloader.batch_size
 
-                if step % 100 == 0:
+                if step % 1 == 0:
                     # clear_output(wait=True)
                     print('Current step: {}  Loss: {}  Acc: {}  AllocMem (Mb): {}'.format(
                         step, loss, acc, torch.cuda.memory_allocated()/1024/1024), flush=True)
@@ -292,6 +301,9 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     outputs_dir = Path("outputs")
                     cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
                     cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
+
+                if step > 20:
+                    break
 
             epoch_loss = running_loss / len(dataloader.dataset)
             epoch_acc = running_acc / len(dataloader.dataset)
@@ -339,8 +351,8 @@ if Path(path).exists():
 
 train_dataset = RestorationDataset()
 
-train_loader = data.DataLoader(train_dataset, batch_size=16,  # batch size 16, workers 4
-        pin_memory=False, shuffle=True, num_workers=16, drop_last=True)
+train_loader = data.DataLoader(train_dataset, batch_size=16,  # batch size 16, workers 16
+        pin_memory=False, shuffle=False, num_workers=1, drop_last=True)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=40)
 

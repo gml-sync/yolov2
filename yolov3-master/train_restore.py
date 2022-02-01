@@ -251,7 +251,6 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
             for x, y in dataloader:
                 x = x.to(DEVICE)
                 y = y.to(DEVICE)
-                step += 1
 
                 # forward pass
                 if phase == 'train':
@@ -299,11 +298,13 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     gt_image = y.detach()[0].permute(1,2,0).cpu().numpy()
                     pred = outputs.detach()[0].permute(1,2,0).cpu().numpy()
                     outputs_dir = Path("outputs")
-                    cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
-                    cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
+                    cv2.imwrite(str(outputs_dir / f"{step:05d}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
+                    cv2.imwrite(str(outputs_dir / f"{step:05d}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
 
                 if step > 6000:
                     break
+
+                step += 1
 
             epoch_loss = running_loss / len(dataloader.dataset)
             epoch_acc = running_acc / len(dataloader.dataset)

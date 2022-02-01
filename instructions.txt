@@ -8,11 +8,14 @@ https://github.com/ultralytics/yolov3
 python train.py --weights models/yolov3.pt > >(tee logfile) 2>&1
 
 Изменил:
+Начал помечать свои комменты меткой MV
 models/yolo.py - _forward_once для сохранения слоев
 utils/plots.py - save_intermediate, использую einops для tiling
 train.py - train, там где forward, сохраняю промежуточные слои
+data/hyps/hyp.scratch.yaml - занулил mosaic и т.п.
 
 Данные:
+visualize - туда сохраняются признаки
 feat_16k_v1 - пробная генерация, с аугментацией, без сохранения min/max в признаках
 feat_16k_v2 - добавил *_*_range.txt для feature scaling перед сохранением
 
@@ -40,4 +43,3 @@ coco_5k — COCO val 2017
   'metric_name':
 ]
 
-heh

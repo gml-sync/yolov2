@@ -27,6 +27,7 @@ def cut_and_save(settings, result_dir):
 
     gt_files = sorted(Path(settings.gt_images_path).rglob("*image.jpg"))
     out_files = sorted(Path(settings.output_path).rglob("*.jpg"))
+    coco_files = sorted(Path(settings.output_path).rglob("*.jpg"))
     # 5000 files in each folder
 
     for idx in range(len(gt_files)):
@@ -38,8 +39,21 @@ def cut_and_save(settings, result_dir):
         # var = avg( (x_i - avg(x))^2 )
         avg = np.average(gt, axis=1)
         variance = np.average((gt - avg) ** 2, axis=1) # broadcasting
-        print(variance[:10], variance[300:310], variance[-10:])
-        print(variance < 0.008)
+        low_var = variance < 0.008
+        min_w = 0 # cut image in [min_w; max_w)
+        max_w = 0
+        i = 0
+        while i < h and low_var[i]:
+            i += 1
+        min_w = i
+        while i < h and not low_var[i]:
+            i += 1
+        max_w = i
+        while i < h and low_var[i]:
+            i += 1
+        if i != h:
+            print("Strip detection error on image", idx)
+        print(min_w, max_w)
 
         break
 
@@ -48,6 +62,7 @@ class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
         self.output_path = "outputs-0"
+        self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():
     settings = Settings()

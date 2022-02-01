@@ -8,9 +8,9 @@ import imageio
 from skimage import io
 import matplotlib.pyplot as plt
 
-new_path = "d:/ra-examples/new_model"
-old_path = "d:/ra-examples/old_model"
-output_path = "d:/ra-examples/example.png"
+new_path = "d:/Iter/ffmpeg-4.2.2-win64-static/bin/h264"
+#old_path = "d:/ra-examples/old_model"
+output_path = "d:/example.png"
 
 #    Method 1: imageio.mimwrite
 # files = ["1_gt_image", "1_pred", "2_pred"]
@@ -35,6 +35,6 @@ output_path = "d:/ra-examples/example.png"
 #    Method 3: create APNG (doesn't work on Windows, but works in Google Docs)
 
 from apng import APNG
-files = ["1_gt_image", "1_pred", "2_pred"]
-files = [os.path.join(new_path, filename + ".jpg") for filename in files]
+files = ["example_20", "example_37", "example_42", "example_47", "example_52"]
+files = [os.path.join(new_path, filename + ".bmp") for filename in files]
 APNG.from_files(files, delay=1000).save(output_path)

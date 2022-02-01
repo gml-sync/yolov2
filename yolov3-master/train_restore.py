@@ -302,7 +302,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     cv2.imwrite(str(outputs_dir / f"{step}_pred.jpg"), np.clip(pred * 255, 0, 255).astype(np.uint8))
                     cv2.imwrite(str(outputs_dir / f"{step}_gt_image.jpg"), (gt_image * 255).astype(np.uint8))
 
-                if step > 20:
+                if step > 6000:
                     break
 
             epoch_loss = running_loss / len(dataloader.dataset)

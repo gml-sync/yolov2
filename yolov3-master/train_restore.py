@@ -239,7 +239,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
 
         for phase in ['train']:
             if phase == 'train':
-                model.train(True)  # Set trainind mode = true
+                model.train(False)  # Set trainind mode = true
                 dataloader = train_dl
             else:
                 model.train(False)  # Set model to evaluate mode
@@ -257,16 +257,17 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
 
                 # forward pass
                 if phase == 'train':
-                    # zero the gradients
-                    optimizer.zero_grad()
-                    outputs = model(x)
-                    loss = loss_fn(outputs, y)
+                    with torch.no_grad():
+                        # zero the gradients
+                        # optimizer.zero_grad()
+                        outputs = model(x)
+                        loss = loss_fn(outputs, y)
 
-                    # the backward pass frees the graph memory, so there is no 
-                    # need for torch.no_grad in this training pass
-                    loss.backward()
-                    optimizer.step()
-                    # scheduler.step()
+                        # the backward pass frees the graph memory, so there is no
+                        # need for torch.no_grad in this training pass
+                        # loss.backward()
+                        # optimizer.step()
+                        # scheduler.step()
 
                 else:
                     print("WHAT??")
@@ -287,16 +288,17 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     #print(torch.cuda.memory_summary())
 
                     # Save model
-                    model_path = Path("checkpoints/restore_model.pth")
-                    PATH = checkpoint_save_path(model_path)
-
-                    checkpoint = {
-                        'model': model,
-                        'optimizer': optimizer,
-                        'step': step
-                    }
-                    torch.save(checkpoint, PATH)
-                    checkpoint_save_path(PATH, save_json=True)
+                    
+                    # model_path = Path("checkpoints/restore_model.pth")
+                    # PATH = checkpoint_save_path(model_path)
+                    #
+                    # checkpoint = {
+                    #     'model': model,
+                    #     'optimizer': optimizer,
+                    #     'step': step
+                    # }
+                    # torch.save(checkpoint, PATH)
+                    # checkpoint_save_path(PATH, save_json=True)
 
                     gt_image = y.detach()[0].permute(1,2,0).cpu().numpy()
                     pred = outputs.detach()[0].permute(1,2,0).cpu().numpy()

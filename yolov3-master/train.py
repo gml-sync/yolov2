@@ -271,7 +271,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                 f"Logging results to {colorstr('bold', save_dir)}\n"
                 f'Starting training for {epochs} epochs...')
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
-        model.train()
+        model.train(False) # MV disable training
 
         # Update image weights (optional, single-GPU only)
         if opt.image_weights:
@@ -295,16 +295,16 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             ni = i + nb * epoch  # number integrated batches (since train start)
             imgs = imgs.to(device, non_blocking=True).float() / 255  # uint8 to float32, 0-255 to 0.0-1.0
 
-            # Warmup
-            if ni <= nw:
-                xi = [0, nw]  # x interp
-                # compute_loss.gr = np.interp(ni, xi, [0.0, 1.0])  # iou loss ratio (obj_loss = 1.0 or iou)
-                accumulate = max(1, np.interp(ni, xi, [1, nbs / batch_size]).round())
-                for j, x in enumerate(optimizer.param_groups):
-                    # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
-                    x['lr'] = np.interp(ni, xi, [hyp['warmup_bias_lr'] if j == 2 else 0.0, x['initial_lr'] * lf(epoch)])
-                    if 'momentum' in x:
-                        x['momentum'] = np.interp(ni, xi, [hyp['warmup_momentum'], hyp['momentum']])
+            # # Warmup
+            # if ni <= nw:
+            #     xi = [0, nw]  # x interp
+            #     # compute_loss.gr = np.interp(ni, xi, [0.0, 1.0])  # iou loss ratio (obj_loss = 1.0 or iou)
+            #     accumulate = max(1, np.interp(ni, xi, [1, nbs / batch_size]).round())
+            #     for j, x in enumerate(optimizer.param_groups):
+            #         # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
+            #         x['lr'] = np.interp(ni, xi, [hyp['warmup_bias_lr'] if j == 2 else 0.0, x['initial_lr'] * lf(epoch)])
+            #         if 'momentum' in x:
+            #             x['momentum'] = np.interp(ni, xi, [hyp['warmup_momentum'], hyp['momentum']])
 
             # Multi-scale
             if opt.multi_scale:
@@ -316,36 +316,39 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
 
             # Forward
             with amp.autocast(enabled=cuda):
-                pred = model(imgs)  # forward
-                # save image and features
-                #LOGGER.info(f"\n********************************* SAVING IMAGE DTYPE {model.save_image.dtype} SIZE {model.save_image.size()}")
-                save_intermediate(model.save_image, module_type="image", stage=i, save_dir=Path("visualize"))
-                save_intermediate(model.save_features, module_type="features", stage=i, save_dir=Path("visualize"))
-                loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
-                if RANK != -1:
-                    loss *= WORLD_SIZE  # gradient averaged between devices in DDP mode
-                if opt.quad:
-                    loss *= 4.
+                with torch.no_grad():
+                    pred = model(imgs)  # forward
+
+                    # save image and features
+
+                    # LOGGER.info(f"\n********************************* SAVING IMAGE DTYPE {model.save_image.dtype} SIZE {model.save_image.size()}")
+                    save_intermediate(model.save_image, module_type="image", stage=i, save_dir=Path("visualize"))
+                    save_intermediate(model.save_features, module_type="features", stage=i, save_dir=Path("visualize"))
+                    # loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
+                    # if RANK != -1:
+                    #     loss *= WORLD_SIZE  # gradient averaged between devices in DDP mode
+                    # if opt.quad:
+                    #     loss *= 4.
             
-            # Backward
-            scaler.scale(loss).backward()
+            # # Backward
+            # scaler.scale(loss).backward()
 
-            # Optimize
-            if ni - last_opt_step >= accumulate:
-                scaler.step(optimizer)  # optimizer.step
-                scaler.update()
-                optimizer.zero_grad()
-                if ema:
-                    ema.update(model)
-                last_opt_step = ni
+            # # Optimize
+            # if ni - last_opt_step >= accumulate:
+            #     scaler.step(optimizer)  # optimizer.step
+            #     scaler.update()
+            #     optimizer.zero_grad()
+            #     if ema:
+            #         ema.update(model)
+            #     last_opt_step = ni
 
-            # Log
-            if RANK in [-1, 0]:
-                mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
-                mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
-                pbar.set_description(('%10s' * 2 + '%10.4g' * 5) % (
-                    f'{epoch}/{epochs - 1}', mem, *mloss, targets.shape[0], imgs.shape[-1]))
-                callbacks.run('on_train_batch_end', ni, model, imgs, targets, paths, plots, opt.sync_bn)
+            # # Log
+            # if RANK in [-1, 0]:
+            #     mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
+            #     mem = f'{torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0:.3g}G'  # (GB)
+            #     pbar.set_description(('%10s' * 2 + '%10.4g' * 5) % (
+            #         f'{epoch}/{epochs - 1}', mem, *mloss, targets.shape[0], imgs.shape[-1]))
+            #     callbacks.run('on_train_batch_end', ni, model, imgs, targets, paths, plots, opt.sync_bn)
             # end batch ------------------------------------------------------------------------------------------------
 
         # Scheduler

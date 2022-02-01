@@ -27,8 +27,19 @@ def cut_and_save(settings, result_dir):
 
     gt_files = sorted(Path(settings.gt_images_path).rglob("*image.jpg"))
     out_files = sorted(Path(settings.output_path).rglob("*.jpg"))
-    print(len(gt_files), len(out_files))
-    print(gt_files[0], out_files[0])
+    # 5000 files in each folder
+
+    for idx in range(len(gt_files)):
+        gt = cv2.imread(gt_files[idx]).astype(np.float32) / 255
+        h, w = gt.shape[:2]
+
+        # count variance by row
+        # var = avg( (x_i - avg(x))^2 )
+        avg = np.average(gt, axis=1)
+        variance = np.average((gt - avg) ** 2, axis=1) # broadcasting
+        print(variance[:10], variance[300:310], variance[-10:])
+
+        break
 
 
 class Settings:

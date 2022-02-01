@@ -27,7 +27,7 @@ class RestorationDataset(data.Dataset):
         self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
         self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
-        self.qp_idx = 27
+        self.qp_idx = 2
         self.img_idx = 0
 
     def __getitem__(self, index):
@@ -42,11 +42,14 @@ class RestorationDataset(data.Dataset):
         qp_idx = self.qp_idx
         #qp_idx = np.random.randint(len(rand_qps))
         rand_qp = rand_qps[qp_idx]
-        if self.qp_idx == 0:
-            self.qp_idx = len(rand_qps) - 1
-        elif self.qp_idx == len(rand_qps) - 1:
-            self.qp_idx = 0
-            self.img_idx += 1
+
+        # Cycle QP and image idx
+
+        # if self.qp_idx == 0:
+        #     self.qp_idx = len(rand_qps) - 1
+        # elif self.qp_idx == len(rand_qps) - 1:
+        #     self.qp_idx = 0
+        #     self.img_idx += 1
 
         worker_info = torch.utils.data.get_worker_info()
         if worker_info is None: # single-process data loading

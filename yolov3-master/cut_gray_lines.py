@@ -30,7 +30,7 @@ def cut_and_save(settings, result_dir):
     # 5000 files in each folder
 
     for idx in range(len(gt_files)):
-        print(gt_files[idx])
+        print(type(gt_files[idx]))
         print( Path(gt_files[idx]).exists() )
         gt = cv2.imread(gt_files[idx]).astype(np.float32) / 255
         h, w = gt.shape[:2]

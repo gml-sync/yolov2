@@ -27,7 +27,7 @@ class RestorationDataset(data.Dataset):
         self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
         self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
-        self.qp_idx = 2
+        self.qp_idx = 4
         self.img_idx = 0
 
     def __getitem__(self, index):

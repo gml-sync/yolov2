@@ -36,6 +36,6 @@ class Settings:
         self.gt_images_path = "visualize"
         self.output_path = "outputs-0"
 
-settings = Settings()
-
-cut_and_save(settings, None)
+def main():
+    settings = Settings()
+    cut_and_save(settings, None)

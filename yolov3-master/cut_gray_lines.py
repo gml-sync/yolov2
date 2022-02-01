@@ -41,7 +41,7 @@ def cut_and_save(settings, result_dir):
         variance = np.average((gt - avg) ** 2, axis=1) # broadcasting
         low_var = variance < 0.008
         print(low_var[300:310])
-        x = 1 - low_var
+        x = ~low_var
         print(x[300:310])
         break
         min_w = 0 # cut image in [min_w; max_w)

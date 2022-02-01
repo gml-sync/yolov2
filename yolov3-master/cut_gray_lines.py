@@ -39,7 +39,7 @@ def cut_and_save(settings, result_dir):
         avg = np.average(gt, axis=1)
         variance = np.average((gt - avg) ** 2, axis=1) # broadcasting
         print(variance[:10], variance[300:310], variance[-10:])
-        print(variance < 0.08)
+        print(variance < 0.008)
 
         break
 

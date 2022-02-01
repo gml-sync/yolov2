@@ -27,7 +27,7 @@ class RestorationDataset(data.Dataset):
         self.image_list = sorted(glob(dataset_root + "/*image.jpg"))
         self.desc_list = sorted(glob(dataset_root + "/*range.txt"))
 
-        self.qp_idx = 2
+        self.qp_idx = 0
         self.img_idx = 0
 
     def __getitem__(self, index):
@@ -288,7 +288,7 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
                     #print(torch.cuda.memory_summary())
 
                     # Save model
-                    
+
                     # model_path = Path("checkpoints/restore_model.pth")
                     # PATH = checkpoint_save_path(model_path)
                     #

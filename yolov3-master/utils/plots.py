@@ -138,7 +138,7 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
                     # save image
 
                     #f = f"stage{stage}_{module_type.split('.')[-1]}_features.jpg"  # filename
-                    f = f"{stage}_{batch_i}_image.jpg"  # filename
+                    f = "{:05d}_{}_image.jpg".format(stage, batch_i)  # filename
                     #LOGGER.info(f"\n********************************* PLOT DTYPE {x.dtype} SIZE {x.size()}")
                     image = x[batch_i].cpu().permute(1, 2, 0) # c h w -> h w c
                     image = image[:, :, [2, 1, 0]] # rgb -> bgr
@@ -148,13 +148,13 @@ def save_intermediate(x, module_type="", stage=0, n=32, save_dir=Path('runs/dete
                     # save features
 
                     #f = f"stage{stage}_{module_type.split('.')[-1]}_features.png"  # filename
-                    f = f"{stage}_{batch_i}_features.png"  # filename
+                    f = "{:05d}_{}_features.png".format(stage, batch_i)  # filename
                     image = x[batch_i].cpu()
                     #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
                     image = einops.rearrange(image, '(i1 i2) h w -> (i1 h) (i2 w)', i1=16) # 16 is specific to layer 5
                     #LOGGER.info(f"\nSaving features... DTYPE {x.dtype} SIZE {x.size()} MIN {x.min()} MAX {x.max()}")
 
-                    range_f = f"{stage}_{batch_i}_range.txt"  # filename
+                    range_f = "{:05d}_{}_range.txt".format(stage, batch_i)  # filename
                     with open(save_dir / range_f, "w") as range_file:
                         print(image.min().detach().numpy(), image.max().detach().numpy(), file=range_file)
 

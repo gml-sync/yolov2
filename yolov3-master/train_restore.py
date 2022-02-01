@@ -360,7 +360,7 @@ if Path(path).exists():
 train_dataset = RestorationDataset()
 
 train_loader = data.DataLoader(train_dataset, batch_size=1,  # batch size 16, workers 16
-        pin_memory=False, shuffle=False, num_workers=1, drop_last=True)
+        pin_memory=False, shuffle=False, num_workers=16, drop_last=True)
 
 train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1) # epochs 40
 

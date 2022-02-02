@@ -60,7 +60,7 @@ def cut_and_save(settings, result_dir):
         # count variance by column (left/right strips)
         sobel = gt[1:, :] - gt[:h - 1, :]
         variance = np.average(sobel ** 2, axis=0)
-        gray_diff = np.average((gt - solid_gray) ** 2, axis=1)
+        gray_diff = np.average((gt - solid_gray) ** 2, axis=0)
         high_var = gray_diff > gray_thr
         grid = np.arange(w)
         min_h = grid[high_var].min()

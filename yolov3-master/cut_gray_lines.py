@@ -68,7 +68,7 @@ def single_process(settings, result_dir, file_lists, idx):
 
     res_path = str(result_dir / f"{idx:05d}_cut.jpg")
     cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(resized * 255, 0, 255).astype(np.uint8),
-                [cv2.IMWRITE_JPEG_QUALITY, 85])
+                [cv2.IMWRITE_JPEG_QUALITY, 95])
 
     res_h, res_w = resized.shape[:2]
     print(f"image {str(gt_files[idx])} res_h {res_h} res_w {res_w} coco_h {coco_h} coco_w {coco_w} aspect diff {res_h / res_w - coco_h / coco_w}")

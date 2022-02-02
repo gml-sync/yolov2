@@ -41,12 +41,13 @@ def cut_and_save(settings, result_dir):
         # Use sobel + difference from gray
         solid_gray = 0.44705883
         sobel_thr = 1e-5
+        gray_thr = 1e-5
 
         sobel = gt[:, 1:] - gt[:, :w-1]
         variance = np.average(sobel ** 2, axis=1)
         gray_diff = np.average((gt - solid_gray) ** 2, axis=1)
-        print(gray_diff)
-        high_var = variance > 1e-5
+        #print(gray_diff)
+        high_var = gray_diff > gray_thr
         grid = np.arange(h)
         min_w = grid[high_var].min()
         max_w = grid[high_var].max() + 1
@@ -59,17 +60,18 @@ def cut_and_save(settings, result_dir):
         # count variance by column (left/right strips)
         sobel = gt[1:, :] - gt[:h - 1, :]
         variance = np.average(sobel ** 2, axis=0)
-        high_var = variance > 1e-5
+        gray_diff = np.average((gt - solid_gray) ** 2, axis=1)
+        high_var = gray_diff > gray_thr
         grid = np.arange(w)
         min_h = grid[high_var].min()
         max_h = grid[high_var].max() + 1
         if np.sum(~high_var[min_h:max_h]) != 0:
             print("Strip detection error on image", idx)
 
-        print(gt[:5, :5])
+        #print(gt[:5, :5])
 
 
-        if idx > 1:
+        if idx > 10:
             break
 
 

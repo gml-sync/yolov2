@@ -33,7 +33,7 @@ def cut_and_save(settings, result_dir):
 
     for idx in range(len(gt_files)):
         res_path = result_dir / coco_files[idx].name
-        shutil.copy(out_files[idx], res_path)
+        shutil.move(out_files[idx], res_path)
     return
 
     for idx in range(len(gt_files)):
@@ -95,7 +95,7 @@ def cut_and_save(settings, result_dir):
 class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
-        self.output_path = "cut-0"
+        self.output_path = "cut-27"
         self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():

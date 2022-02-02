@@ -50,6 +50,8 @@ def cut_and_save(settings, result_dir):
         cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
                     [cv2.IMWRITE_JPEG_QUALITY, 100])
 
+        if idx == 2:
+            print(variance)
 
         if idx > 10:
             break

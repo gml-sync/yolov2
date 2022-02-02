@@ -33,6 +33,7 @@ def cut_and_save(settings, result_dir):
     for idx in range(len(gt_files)):
         gt = cv2.imread(str(gt_files[idx]))
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
+        coco_gt = cv2.imread(str(coco_files[idx]))
         h, w = gt.shape
 
         # Count variance by row (top/bottom strips).
@@ -68,14 +69,18 @@ def cut_and_save(settings, result_dir):
         if np.sum(~high_var[min_w:max_w]) != 0:
             print("Strip detection error on image", idx)
 
-        res_image = gt[min_h:max_h, min_w:max_w]
-        res_path = str(result_dir / f"{idx:05d}_cut.jpg")
-        cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
-                    [cv2.IMWRITE_JPEG_QUALITY, 100])
+        res_h, res_w = max_h - min_h, max_w - min_w
+        coco_h, coco_w = coco_gt.shape[:2]
+        print ((res_h/res_w - coco_h/coco_w)**2)
+
+        # res_image = gt[min_h:max_h, min_w:max_w]
+        # res_path = str(result_dir / f"{idx:05d}_cut.jpg")
+        # cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+        #             [cv2.IMWRITE_JPEG_QUALITY, 100])
 
 
-        # if idx > 1000:
-        #     break
+        if idx > 10:
+            break
 
 
 class Settings:

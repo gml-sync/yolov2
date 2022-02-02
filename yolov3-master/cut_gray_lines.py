@@ -78,7 +78,7 @@ def single_process(settings, result_dir, file_lists, idx):
 
     return None
 
-def cut_and_save(settings, result_dir):
+def cut_and_save(settings):
     # gt
     # ├─00000
     #   ...
@@ -92,13 +92,16 @@ def cut_and_save(settings, result_dir):
     # └──────04999_pred.jpg
 
     gt_files = sorted(Path(settings.gt_images_path).rglob("*image.jpg"))
-    out_files = sorted(Path(settings.output_path).rglob("*.jpg"))
     coco_files = sorted(Path(settings.coco_path).rglob("*.jpg"))
     # 5000 files in each folder
 
-    file_lists = [gt_files, out_files, coco_files]
-    for idx in range(len(gt_files)):
-        single_process(settings, result_dir, file_lists, idx)
+    for params_idx in range(len(settings.output_paths)):
+        output_path = settings.output_paths[params_idx]
+        result_dir = settings.result_paths[params_idx]
+        out_files = sorted(Path(output_path).rglob("*.jpg"))
+        file_lists = [gt_files, out_files, coco_files]
+        for idx in range(len(gt_files)):
+            single_process(settings, result_dir, file_lists, idx)
 
     # # Step 1: Init multiprocessing.Pool()
     # pool = mp.Pool(10)
@@ -111,13 +114,14 @@ def cut_and_save(settings, result_dir):
 class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
-        self.output_path = "outputs-0"
+        self.output_paths = ["outputs-0", "outputs-27", "outputs-37"]
+        self.result_paths = ["cut-0", "cut-27", "cut-37"]
         self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():
     settings = Settings()
 
-    result_dir = Path("cut_output")
-    result_dir.mkdir(exist_ok=True)
+    for result_dir in settings.result_paths:
+        result_dir.mkdir(exist_ok=True)
 
-    cut_and_save(settings, result_dir)
+    cut_and_save(settings)

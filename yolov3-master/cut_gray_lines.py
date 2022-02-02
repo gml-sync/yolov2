@@ -115,7 +115,7 @@ def cut_and_save(settings, result_dir):
 class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
-        self.output_path = "cut-0"
+        self.output_path = "outputs-0"
         self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():

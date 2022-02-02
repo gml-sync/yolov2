@@ -35,11 +35,17 @@ def cut_and_save(settings, result_dir):
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
         h, w = gt.shape
 
-        # count variance by row (top/bottom strips)
+        # Count variance by row (top/bottom strips).
         # var = avg( (x_i - avg(x))^2 )
-        # variance works very bad!
+        # Variance works very bad!
+        # Use sobel + difference from gray
+        solid_gray = 0.44705883
+        sobel_thr = 1e-5
+
         sobel = gt[:, 1:] - gt[:, :w-1]
         variance = np.average(sobel ** 2, axis=1)
+        gray_diff = np.average((gt - solid_gray) ** 2, axis=1)
+        print(gray_diff)
         high_var = variance > 1e-5
         grid = np.arange(h)
         min_w = grid[high_var].min()

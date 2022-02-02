@@ -35,7 +35,7 @@ def cut_and_save(settings, result_dir):
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
         h, w = gt.shape
 
-        # count variance by row
+        # count variance by row (top/bottom strips)
         # var = avg( (x_i - avg(x))^2 )
         # variance works very bad!
         sobel = gt[:, 1:] - gt[:, :w-1]
@@ -46,14 +46,23 @@ def cut_and_save(settings, result_dir):
         max_w = grid[high_var].max() + 1
         if np.sum(~high_var[min_w:max_w]) != 0:
             print("Strip detection error on image", idx)
-        print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
-        cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
-                    [cv2.IMWRITE_JPEG_QUALITY, 100])
+        # print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
+        # cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
+        #             [cv2.IMWRITE_JPEG_QUALITY, 100])
 
-        if idx == 2:
-            print(variance)
+        # count variance by column (left/right strips)
+        sobel = gt[1:, :] - gt[:h - 1, :]
+        variance = np.average(sobel ** 2, axis=0)
+        high_var = variance > 1e-5
+        grid = np.arange(w)
+        min_h = grid[high_var].min()
+        max_h = grid[high_var].max() + 1
+        if np.sum(~high_var[min_h:max_h]) != 0:
+            print("Strip detection error on image", idx)
 
-        if idx > 10:
+        print(idx)
+
+        if idx > 500:
             break
 
 

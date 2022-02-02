@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 import datetime as dt
 import shutil
+import multiprocessing as mp
 
 import numpy as np
 import cv2
@@ -30,11 +31,6 @@ def cut_and_save(settings, result_dir):
     out_files = sorted(Path(settings.output_path).rglob("*.jpg"))
     coco_files = sorted(Path(settings.coco_path).rglob("*.jpg"))
     # 5000 files in each folder
-
-    for idx in range(len(gt_files)):
-        res_path = result_dir / coco_files[idx].name
-        shutil.move(out_files[idx], res_path)
-    return
 
     for idx in range(len(gt_files)):
         gt = cv2.imread(str(gt_files[idx]))
@@ -83,8 +79,8 @@ def cut_and_save(settings, result_dir):
 
         res_image = out_image[min_h:max_h, min_w:max_w]
         res_path = str(result_dir / f"{idx:05d}_cut.jpg")
-        cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(res_image * 255, 0, 255).astype(np.uint8),
-                    [cv2.IMWRITE_JPEG_QUALITY, 100])
+        # cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+        #             [cv2.IMWRITE_JPEG_QUALITY, 100])
 
         if idx % 500 == 0:
             print(idx)
@@ -104,4 +100,5 @@ def main():
     result_dir = Path("cut_output")
     result_dir.mkdir(exist_ok=True)
 
-    cut_and_save(settings, result_dir)
+    #cut_and_save(settings, result_dir)
+    print(mp.cpu_count())

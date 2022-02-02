@@ -81,6 +81,9 @@ def cut_and_save(settings, result_dir):
         cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
                     [cv2.IMWRITE_JPEG_QUALITY, 100])
 
+        if idx % 500 == 0:
+            print(idx)
+
 
 
 

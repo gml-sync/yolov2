@@ -39,6 +39,7 @@ def cut_and_save(settings, result_dir):
         # var = avg( (x_i - avg(x))^2 )
         avg = np.average(gt, axis=1)
         variance = np.average((gt - avg) ** 2, axis=1) # broadcasting. shape=(h)
+        print(np.min(variance), np.max(variance))
         high_var = variance > 0.008
         grid = np.arange(h)
         min_w = grid[high_var].min()

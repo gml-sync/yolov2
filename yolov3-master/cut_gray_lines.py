@@ -60,9 +60,10 @@ def cut_and_save(settings, result_dir):
         if np.sum(~high_var[min_h:max_h]) != 0:
             print("Strip detection error on image", idx)
 
-        print(idx)
+        print(gt[:5, :5])
 
-        if idx > 500:
+
+        if idx > 1:
             break
 
 

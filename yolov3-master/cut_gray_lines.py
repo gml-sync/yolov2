@@ -53,7 +53,7 @@ def cut_and_save(settings, result_dir):
         max_w = grid[high_var].max() + 1
         if np.sum(~high_var[min_w:max_w]) != 0:
             print("Strip detection error on image", idx)
-        # print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
+        print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
         # cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
         #             [cv2.IMWRITE_JPEG_QUALITY, 100])
 

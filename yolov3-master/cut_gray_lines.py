@@ -33,7 +33,8 @@ def cut_and_save(settings, result_dir):
     for idx in range(len(gt_files)):
         gt = cv2.imread(str(gt_files[idx]))
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
-        coco_gt = cv2.imread(str(coco_files[idx]))
+        out_image = cv2.imread(str(out_files[idx])).astype(np.float32) / 255
+        coco_gt = cv2.imread(str(coco_files[idx])).astype(np.float32) / 255
         h, w = gt.shape
 
         # Count variance by row (top/bottom strips).
@@ -75,10 +76,10 @@ def cut_and_save(settings, result_dir):
             print("Aspect ratio violation on image", idx, "coco", str(coco_files[idx]))
         # print(f"image {str(gt_files[idx])} aspect {res_h/res_w} org aspect {coco_h/coco_w}")
 
-        # res_image = gt[min_h:max_h, min_w:max_w]
-        # res_path = str(result_dir / f"{idx:05d}_cut.jpg")
-        # cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
-        #             [cv2.IMWRITE_JPEG_QUALITY, 100])
+        res_image = out_image[min_h:max_h, min_w:max_w]
+        res_path = str(result_dir / f"{idx:05d}_cut.jpg")
+        cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+                    [cv2.IMWRITE_JPEG_QUALITY, 100])
 
 
 

@@ -39,11 +39,10 @@ def cut_and_save(settings, result_dir):
         # var = avg( (x_i - avg(x))^2 )
         avg = np.average(gt, axis=1)
         variance = np.average((gt - avg) ** 2, axis=1) # broadcasting. shape=(h)
-        print(variance.shape, h, w)
         high_var = variance > 0.008
         min_w = np.argmin(high_var)
         max_w = np.argmax(high_var) + 1
-        print(np.sum(~variance[min_w:max_w]))
+        print(np.sum(~high_var[min_w:max_w]))
         break
         min_w = 0 # cut image in [min_w; max_w)
         max_w = 0

@@ -39,14 +39,13 @@ def cut_and_save(settings, result_dir):
         # var = avg( (x_i - avg(x))^2 )
         avg = np.average(gt, axis=1)
         variance = np.average((gt - avg) ** 2, axis=1) # broadcasting. shape=(h)
-        print(np.min(variance), np.max(variance))
         high_var = variance > 0.008
         grid = np.arange(h)
         min_w = grid[high_var].min()
         max_w = grid[high_var].max() + 1
         if np.sum(~high_var[min_w:max_w]) != 0:
             print("Strip detection error on image", idx)
-        print(f"image {str(gt_files[idx])} min {min_w} max {max_w}")
+        print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
 
         if idx > 10:
             break

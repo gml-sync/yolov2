@@ -81,8 +81,6 @@ def cut_and_save(settings, result_dir):
         #             [cv2.IMWRITE_JPEG_QUALITY, 100])
 
 
-        if idx > 20:
-            break
 
 
 class Settings:

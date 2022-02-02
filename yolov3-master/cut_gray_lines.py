@@ -32,7 +32,7 @@ def cut_and_save(settings, result_dir):
     coco_files = sorted(Path(settings.coco_path).rglob("*.jpg"))
     # 5000 files in each folder
 
-    for idx in range(len(gt_files)):
+    def single_process(idx):
         gt = cv2.imread(str(gt_files[idx]))
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
         out_image = cv2.imread(str(out_files[idx])).astype(np.float32) / 255
@@ -84,6 +84,14 @@ def cut_and_save(settings, result_dir):
 
         if idx % 500 == 0:
             print(idx)
+
+    # Step 1: Init multiprocessing.Pool()
+    pool = mp.Pool(mp.cpu_count())
+    # Step 2: pool.apply
+    results = [pool.apply(single_process, args=(idx)) for idx in range(len(gt_files))]
+    # Step 3: Don't forget to close
+    pool.close()
+    
 
 
 

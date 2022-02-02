@@ -40,7 +40,7 @@ def cut_and_save(settings, result_dir):
         # variance works very bad!
         sobel = gt[:, 1:] - gt[:, :w-1]
         variance = np.average(sobel ** 2, axis=1)
-        high_var = variance > 0.0000001
+        high_var = variance > 1e-5
         grid = np.arange(h)
         min_w = grid[high_var].min()
         max_w = grid[high_var].max() + 1

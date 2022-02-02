@@ -71,7 +71,9 @@ def cut_and_save(settings, result_dir):
 
         res_h, res_w = max_h - min_h, max_w - min_w
         coco_h, coco_w = coco_gt.shape[:2]
-        print(f"image {str(gt_files[idx])} aspect {res_h/res_w} org aspect {coco_h/coco_w}")
+        if (res_h/res_w - coco_h/coco_w) ** 2 > 0.001:
+            print("Aspect ratio violation on image", idx, "coco", str(coco_files[idx]))
+        # print(f"image {str(gt_files[idx])} aspect {res_h/res_w} org aspect {coco_h/coco_w}")
 
         # res_image = gt[min_h:max_h, min_w:max_w]
         # res_path = str(result_dir / f"{idx:05d}_cut.jpg")

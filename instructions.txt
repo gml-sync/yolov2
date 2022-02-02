@@ -1,3 +1,5 @@
+СЕЙЧАС В train_restore только ВАЛИДАЦИЯ, без обучения!!!
+
 # MS COCO 128
 
 upload/coco_128/coco128_010 -> upload/datasets/coco128_010
@@ -12,6 +14,7 @@ python train.py --weights models/yolov3.pt > >(tee logfile) 2>&1
 models/yolo.py - _forward_once для сохранения слоев
 utils/plots.py - save_intermediate, использую einops для tiling
 train.py - train, там где forward, сохраняю промежуточные слои
+    Убрал backpropagation.
 data/hyps/hyp.scratch.yaml - занулил mosaic и т.п.
 
 Данные:
@@ -28,6 +31,8 @@ FFMPEG:
 ffmpeg -loglevel quiet -y -i sample_train/0_0_features.png -c:v libx264 -qp 37 output.mkv && ls -l output.mkv
 ffmpeg -i output.mkv -r 1/1 h264_%03d.bmp
 
+ffmpeg -y -framerate 1 -i input.jpg -c:v libx265 -x265-params qp=1 output.mkv
+ffmpeg -y -i output.mkv -vframes 1 reconstructed.png
 
 python val.py --weights models/yolo-save.pt --data {dataset_template}{name}.yaml --task val --exist-ok --name {name} --project {project} --save-csv --save-txt --save-conf"
 

@@ -11,7 +11,9 @@ import einops
 import torch
 import torch.utils.data as data
 from torch import nn
-from torch.autograd import Variable
+
+import cut_gray_lines
+cut_gray_lines.main()
 
 DEVICE = 'cuda'
 
@@ -84,16 +86,17 @@ class RestorationDataset(data.Dataset):
     def __len__(self):
         return len(self.image_list)
 
-train_dataset = RestorationDataset()
-# f, i = train_dataset[0]
-# print(f.shape, i.shape)
-print(train_dataset.feature_list[1000],
-    train_dataset.image_list[1000],
-    train_dataset.desc_list[1000])
-print("Length of dataset:", len(train_dataset))
-print(f"images: {len(train_dataset.image_list)}, features: {len(train_dataset.feature_list)}, desc: {len(train_dataset.desc_list)}")
 
-os.system("rm *.mkv *.bmp")
+def test_dataset():
+    train_dataset = RestorationDataset()
+    # f, i = train_dataset[0]
+    # print(f.shape, i.shape)
+    print(train_dataset.feature_list[1000],
+        train_dataset.image_list[1000],
+        train_dataset.desc_list[1000])
+    print("Length of dataset:", len(train_dataset))
+    print(f"images: {len(train_dataset.image_list)}, features: {len(train_dataset.feature_list)}, desc: {len(train_dataset.desc_list)}")
+
 
 class RestorationDecoder(nn.Module):
     def __init__(self):
@@ -148,12 +151,12 @@ class RestorationDecoder(nn.Module):
         return block
 
 
-
-model = RestorationDecoder()
-random_tensor = torch.randn(2, 256, 80, 80) # b c h w
-r = model(random_tensor)
-print("Input shape:", random_tensor.shape)
-print("Output shape:", r.shape)
+def test_model():
+    model = RestorationDecoder()
+    random_tensor = torch.randn(2, 256, 80, 80) # b c h w
+    r = model(random_tensor)
+    print("Input shape:", random_tensor.shape)
+    print("Output shape:", r.shape)
 
 
 import json
@@ -329,42 +332,40 @@ def train(model, train_dl, valid_dl, loss_fn, optimizer, acc_fn, epochs=1):
     
     return train_loss, valid_loss
 
+def main():
+    # Create directories
+    model_dir = Path("checkpoints")
+    model_dir.mkdir(parents=True, exist_ok=True)
 
-# Create directories
-model_dir = Path("checkpoints")
-model_dir.mkdir(parents=True, exist_ok=True)
+    outputs_dir = Path("outputs")
+    outputs_dir.mkdir(parents=True, exist_ok=True)
 
-outputs_dir = Path("outputs")
-outputs_dir.mkdir(parents=True, exist_ok=True)
+    os.system("rm *.mkv *.bmp")
 
 
+    model = RestorationDecoder()
+    print("Parameters:", sum(p.numel() for p in model.parameters()))
 
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    loss_fn = nn.MSELoss()
 
-model = RestorationDecoder()
-print("Parameters:", sum(p.numel() for p in model.parameters()))
+    # Load model weights
+    model_path = Path("checkpoints/restore_model.pth")
+    path = checkpoint_load_path(model_path)
+    if Path(path).exists():
+        checkpoint = torch.load(path, map_location=torch.device(DEVICE))
+        if 'model' in checkpoint: # New format, full save
+            model = checkpoint['model']
+            optimizer = checkpoint['optimizer']
+            step = checkpoint['step']
+            print('Continue from', step, 'step')
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-loss_fn = nn.MSELoss()
+    train_dataset = RestorationDataset()
 
-# Load model weights
-model_path = Path("checkpoints/restore_model.pth")
-path = checkpoint_load_path(model_path)
-if Path(path).exists():
-    checkpoint = torch.load(path, map_location=torch.device(DEVICE))
-    if 'model' in checkpoint: # New format, full save
-        model = checkpoint['model']
-        optimizer = checkpoint['optimizer']
-        step = checkpoint['step']
-        print('Continue from', step, 'step')
+    train_loader = data.DataLoader(train_dataset, batch_size=1,  # batch size 16, workers 16
+            pin_memory=False, shuffle=False, num_workers=16, drop_last=True)
 
-train_dataset = RestorationDataset()
-
-train_loader = data.DataLoader(train_dataset, batch_size=1,  # batch size 16, workers 16
-        pin_memory=False, shuffle=False, num_workers=16, drop_last=True)
-
-import cut_gray_lines
-cut_gray_lines.main()
-#train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1) # epochs 40
+    train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1) # epochs 40
 
 # speed: ~10 sec per 100 images
 # with ffmpeg, 16 workers: 7 sec per 160 images

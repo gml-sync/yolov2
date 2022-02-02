@@ -68,11 +68,14 @@ def cut_and_save(settings, result_dir):
         if np.sum(~high_var[min_h:max_h]) != 0:
             print("Strip detection error on image", idx)
 
-        #print(gt[:5, :5])
+        res_image = gt[min_h:max_h, min_w:max_w]
+        res_path = str(result_dir / f"{idx:05d}_cut.jpg")
+        cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+                    [cv2.IMWRITE_JPEG_QUALITY, 100])
 
 
-        if idx > 1000:
-            break
+        # if idx > 1000:
+        #     break
 
 
 class Settings:
@@ -83,4 +86,8 @@ class Settings:
 
 def main():
     settings = Settings()
-    cut_and_save(settings, None)
+
+    result_dir = Path("cut_output")
+    result_dir.mkdir(exist_ok=True)
+
+    cut_and_save(settings, result_dir)

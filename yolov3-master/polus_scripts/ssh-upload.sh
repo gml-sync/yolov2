@@ -4,7 +4,7 @@ abs_path=$(cd "$rel_path" && pwd)       # absolutized and normalized
 echo $SSHPASS
 cd "$rel_path/.." && source polus_scripts/credentials.sh
 echo $SSHPASS
-sshpass -e sftp -oBatchMode=no -b - 23m_vel@calypso.gml-team.ru << !
+SSHPASS=$SSHPASS sshpass -e sftp -oBatchMode=no -b - 23m_vel@calypso.gml-team.ru << !
    cd work/22k_koz/recognition-aware/datasets
    put $1
    bye

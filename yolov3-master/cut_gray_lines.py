@@ -43,6 +43,7 @@ def cut_and_save(settings, result_dir):
         min_w = np.argmin(high_var)
         max_w = np.argmax(high_var) + 1
         print(~high_var)
+        print(~high_var[min_w:max_w])
         print(np.sum((~high_var)[min_w:max_w]))
         break
         min_w = 0 # cut image in [min_w; max_w)

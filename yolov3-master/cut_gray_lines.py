@@ -63,10 +63,14 @@ def single_process(settings, result_dir, file_lists, idx):
         print("Aspect ratio violation on image", idx, "coco", str(coco_files[idx]))
 
     res_image = out_image[min_h:max_h, min_w:max_w]
+    dim = (coco_w, coco_h)
+    resized = cv2.resize(res_image, dim)
+
     res_path = str(result_dir / f"{idx:05d}_cut.jpg")
-    cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+    cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(resized * 255, 0, 255).astype(np.uint8),
                 [cv2.IMWRITE_JPEG_QUALITY, 100])
 
+    res_h, res_w = resized.shape[:2]
     print(f"image {str(gt_files[idx])} res_h {res_h} res_w {res_w} coco_h {coco_h} coco_w {coco_w} aspect diff {res_h / res_w - coco_h / coco_w}")
 
     if idx % 500 == 0:

@@ -45,7 +45,7 @@ def cut_and_save(settings, result_dir):
         max_w = grid[high_var].max() + 1
         if np.sum(~high_var[min_w:max_w]) != 0:
             print("Strip detection error on image", idx)
-        print(f"image {idx} min {min_w} max {max_w}")
+        print(f"image {str(gt_files[idx])} min {min_w} max {max_w}")
 
         if idx > 10:
             break

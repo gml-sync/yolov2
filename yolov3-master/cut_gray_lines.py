@@ -39,19 +39,16 @@ def cut_and_save(settings, result_dir):
         # var = avg( (x_i - avg(x))^2 )
         # variance works very bad!
         sobel = gt[:, 1:] - gt[:, :w-1]
-        variance = np.average(sobel, axis=1)
-        print(variance, variance.min(), variance.max())
-        break
-
-        # high_var = variance > 0.008
-        # grid = np.arange(h)
-        # min_w = grid[high_var].min()
-        # max_w = grid[high_var].max() + 1
-        # if np.sum(~high_var[min_w:max_w]) != 0:
-        #     print("Strip detection error on image", idx)
-        # print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
-        # cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
-        #             [cv2.IMWRITE_JPEG_QUALITY, 100])
+        variance = np.average(sobel ** 2, axis=1)
+        high_var = variance > 0.0000001
+        grid = np.arange(h)
+        min_w = grid[high_var].min()
+        max_w = grid[high_var].max() + 1
+        if np.sum(~high_var[min_w:max_w]) != 0:
+            print("Strip detection error on image", idx)
+        print(f"image {str(gt_files[idx])} min {min_w} max {max_w} minvar {np.min(variance)} maxvar {np.max(variance)}")
+        cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
+                    [cv2.IMWRITE_JPEG_QUALITY, 100])
 
 
         if idx > 10:

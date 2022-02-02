@@ -89,14 +89,16 @@ def cut_and_save(settings, result_dir):
     # 5000 files in each folder
 
     file_lists = [gt_files, out_files, coco_files]
+    for idx in range(len(gt_files)):
+        single_process(settings, result_dir, file_lists, idx)
 
-    # Step 1: Init multiprocessing.Pool()
-    pool = mp.Pool(10)
-    # Step 2: pool.apply
-    results = [pool.apply_async(single_process, args=(settings, result_dir, file_lists, idx)) for idx in range(len(gt_files))]
-    # Step 3: Don't forget to close
-    pool.close()
-    pool.join()
+    # # Step 1: Init multiprocessing.Pool()
+    # pool = mp.Pool(10)
+    # # Step 2: pool.apply
+    # results = [pool.apply_async(single_process, args=(settings, result_dir, file_lists, idx)) for idx in range(len(gt_files))]
+    # # Step 3: Don't forget to close
+    # pool.close()
+    # pool.join()
 
 
 

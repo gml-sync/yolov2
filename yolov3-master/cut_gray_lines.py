@@ -97,7 +97,7 @@ def cut_and_save(settings):
 
     for params_idx in range(len(settings.output_paths)):
         output_path = settings.output_paths[params_idx]
-        result_dir = settings.result_paths[params_idx]
+        result_dir = Path(settings.result_paths[params_idx])
         out_files = sorted(Path(output_path).rglob("*.jpg"))
         file_lists = [gt_files, out_files, coco_files]
         for idx in range(len(gt_files)):
@@ -122,6 +122,6 @@ def main():
     settings = Settings()
 
     for result_dir in settings.result_paths:
-        result_dir.mkdir(exist_ok=True)
+        Path(result_dir).mkdir(exist_ok=True)
 
     cut_and_save(settings)

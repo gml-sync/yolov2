@@ -33,12 +33,13 @@ def cut_and_save(settings, result_dir):
     for idx in range(len(gt_files)):
         gt = cv2.imread(str(gt_files[idx]))
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255
-        h, w = gt.shape[:2]
+        h, w = gt.shape
 
         # count variance by row
         # var = avg( (x_i - avg(x))^2 )
-        avg = np.average(gt, axis=1)
-        variance = np.average((gt - avg) ** 2, axis=1) # broadcasting. shape=(h)
+        # variance works very bad!
+        sobel = gt[:, 1:] - gt[:, :w-1]
+        variance = np.average(sobel, axis=1)
         high_var = variance > 0.008
         grid = np.arange(h)
         min_w = grid[high_var].min()
@@ -49,8 +50,6 @@ def cut_and_save(settings, result_dir):
         cv2.imwrite(f"{idx:05d}_cut.jpg", np.clip(gt * 255, 0, 255).astype(np.uint8),
                     [cv2.IMWRITE_JPEG_QUALITY, 100])
 
-        if idx == 3:
-            print(variance)
 
         if idx > 10:
             break

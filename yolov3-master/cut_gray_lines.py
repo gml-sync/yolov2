@@ -71,10 +71,12 @@ def single_process(settings, result_dir, file_lists, idx):
                 [cv2.IMWRITE_JPEG_QUALITY, 95])
 
     res_h, res_w = resized.shape[:2]
-    print(f"image {str(gt_files[idx])} res_h {res_h} res_w {res_w} coco_h {coco_h} coco_w {coco_w} aspect diff {res_h / res_w - coco_h / coco_w}")
+    #print(f"image {str(gt_files[idx])} res_h {res_h} res_w {res_w} coco_h {coco_h} coco_w {coco_w} aspect diff {res_h / res_w - coco_h / coco_w}")
 
     if idx % 500 == 0:
         print(idx)
+
+    return None
 
 def cut_and_save(settings, result_dir):
     # gt
@@ -97,8 +99,6 @@ def cut_and_save(settings, result_dir):
     file_lists = [gt_files, out_files, coco_files]
     for idx in range(len(gt_files)):
         single_process(settings, result_dir, file_lists, idx)
-        if idx > 10:
-            break
 
     # # Step 1: Init multiprocessing.Pool()
     # pool = mp.Pool(10)

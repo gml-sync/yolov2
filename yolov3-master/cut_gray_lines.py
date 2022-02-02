@@ -64,8 +64,8 @@ def single_process(settings, result_dir, file_lists, idx):
 
     res_image = out_image[min_h:max_h, min_w:max_w]
     res_path = str(result_dir / f"{idx:05d}_cut.jpg")
-    # cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(res_image * 255, 0, 255).astype(np.uint8),
-    #             [cv2.IMWRITE_JPEG_QUALITY, 100])
+    cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+                [cv2.IMWRITE_JPEG_QUALITY, 100])
 
     if idx % 500 == 0:
         print(idx)
@@ -93,9 +93,10 @@ def cut_and_save(settings, result_dir):
     # Step 1: Init multiprocessing.Pool()
     pool = mp.Pool(mp.cpu_count())
     # Step 2: pool.apply
-    results = [pool.apply(single_process, args=(settings, result_dir, file_lists, idx)) for idx in range(len(gt_files))]
+    results = [pool.apply_async(single_process, args=(settings, result_dir, file_lists, idx)) for idx in range(len(gt_files))]
     # Step 3: Don't forget to close
     pool.close()
+    pool.join()
 
 
 

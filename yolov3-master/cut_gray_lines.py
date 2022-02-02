@@ -27,7 +27,7 @@ def cut_and_save(settings, result_dir):
 
     gt_files = sorted(Path(settings.gt_images_path).rglob("*image.jpg"))
     out_files = sorted(Path(settings.output_path).rglob("*.jpg"))
-    coco_files = sorted(Path(settings.output_path).rglob("*.jpg"))
+    coco_files = sorted(Path(settings.coco_path).rglob("*.jpg"))
     # 5000 files in each folder
 
     for idx in range(len(gt_files)):
@@ -71,7 +71,7 @@ def cut_and_save(settings, result_dir):
 
         res_h, res_w = max_h - min_h, max_w - min_w
         coco_h, coco_w = coco_gt.shape[:2]
-        print ((res_h/res_w - coco_h/coco_w)**2)
+        print(f"image {str(gt_files[idx])} aspect {res_h/res_w} org aspect {coco_h/coco_w}")
 
         # res_image = gt[min_h:max_h, min_w:max_w]
         # res_path = str(result_dir / f"{idx:05d}_cut.jpg")
@@ -79,7 +79,7 @@ def cut_and_save(settings, result_dir):
         #             [cv2.IMWRITE_JPEG_QUALITY, 100])
 
 
-        if idx > 10:
+        if idx > 20:
             break
 
 

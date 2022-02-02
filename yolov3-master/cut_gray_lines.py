@@ -3,6 +3,7 @@ from glob import glob
 from pathlib import Path
 import os
 import datetime as dt
+import shutil
 
 import numpy as np
 import cv2
@@ -29,6 +30,11 @@ def cut_and_save(settings, result_dir):
     out_files = sorted(Path(settings.output_path).rglob("*.jpg"))
     coco_files = sorted(Path(settings.coco_path).rglob("*.jpg"))
     # 5000 files in each folder
+
+    for idx in range(len(gt_files)):
+        res_path = result_dir / coco_files[idx].name
+        shutil.copy(out_files[idx], res_path)
+    return
 
     for idx in range(len(gt_files)):
         gt = cv2.imread(str(gt_files[idx]))
@@ -89,7 +95,7 @@ def cut_and_save(settings, result_dir):
 class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
-        self.output_path = "outputs-37"
+        self.output_path = "cut-0"
         self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():

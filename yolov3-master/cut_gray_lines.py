@@ -91,7 +91,7 @@ def cut_and_save(settings, result_dir):
     results = [pool.apply(single_process, args=(idx)) for idx in range(len(gt_files))]
     # Step 3: Don't forget to close
     pool.close()
-    
+
 
 
 
@@ -99,7 +99,7 @@ def cut_and_save(settings, result_dir):
 class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
-        self.output_path = "cut-27"
+        self.output_path = "cut-0"
         self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():
@@ -108,5 +108,4 @@ def main():
     result_dir = Path("cut_output")
     result_dir.mkdir(exist_ok=True)
 
-    #cut_and_save(settings, result_dir)
-    print(mp.cpu_count())
+    cut_and_save(settings, result_dir)

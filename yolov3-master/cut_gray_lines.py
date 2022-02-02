@@ -77,7 +77,7 @@ def cut_and_save(settings, result_dir):
 
         res_image = out_image[min_h:max_h, min_w:max_w]
         res_path = str(result_dir / f"{idx:05d}_cut.jpg")
-        cv2.imwrite(str(result_dir / f"{idx:05d}_cut.jpg"), np.clip(res_image * 255, 0, 255).astype(np.uint8),
+        cv2.imwrite(str(result_dir / coco_files[idx].name), np.clip(res_image * 255, 0, 255).astype(np.uint8),
                     [cv2.IMWRITE_JPEG_QUALITY, 100])
 
         if idx % 500 == 0:
@@ -89,7 +89,7 @@ def cut_and_save(settings, result_dir):
 class Settings:
     def __init__(self):
         self.gt_images_path = "visualize"
-        self.output_path = "outputs-27"
+        self.output_path = "outputs-37"
         self.coco_path = "../datasets/coco5k_ref/images"
 
 def main():

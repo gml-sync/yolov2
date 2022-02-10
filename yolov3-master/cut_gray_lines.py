@@ -61,6 +61,8 @@ def single_process(settings, result_dir, file_lists, idx):
     coco_h, coco_w = coco_gt.shape[:2]
     if (res_h / res_w - coco_h / coco_w) ** 2 > 0.001:
         print("Aspect ratio violation on image", idx, "coco", str(coco_files[idx]))
+    print(res_h, res_w)
+    return
 
     res_image = out_image[min_h:max_h, min_w:max_w]
     dim = (coco_w, coco_h)

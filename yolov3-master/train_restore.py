@@ -367,5 +367,6 @@ def main():
 
     train_loss, valid_loss = train(model, train_loader, None, loss_fn, optimizer, loss_fn, epochs=1) # epochs 40
 
+# main()
 # speed: ~10 sec per 100 images
 # with ffmpeg, 16 workers: 7 sec per 160 images
